@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator"
+	// "github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -25,21 +26,22 @@ var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
 	// aes256Key, _ = generateAESKey(32)
 	aes256Key = []byte("super-secret-key")
-	store     = sessions.NewCookieStore(aes256Key)
-	validate  = validator.New()
+	store    = sessions.NewCookieStore(aes256Key)
+	validate = validator.New()
 )
 
-func generateAESKey(keyLength int) ([]byte, error) {
-	key := make([]byte, keyLength)
-	_, err := rand.Read(key)
-	if err != nil {
-		return nil, err
-	}
-	return key, nil
-}
+// func generateAESKey(keyLength int) ([]byte, error) {
+// 	key := make([]byte, keyLength)
+// 	_, err := rand.Read(key)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return key, nil
+// }
 
 func validSession(r *http.Request) (*sessions.Session, bool) {
-	session, err := store.Get(r, "session-name")
+	session, err := store.Get(r, "val")
+	fmt.Println(session)
 	if err != nil {
 		fmt.Println("Error no session Found !", err)
 		return session, false
@@ -125,11 +127,21 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Wrong password")
 			return
 		}
-		session, _ := store.Get(r, "session-name")
+		session, err := store.Get(r, "val")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(session)
 		session.Values["userID"] = userLogin.UserID
 		session.Values["authenticated"] = true
-		session.Save(r, w)
-		// fmt.Fprintf(w, "Sucessfull login")
+		err = session.Save(r, w)
+		if err != nil {
+			fmt.Println("cant store session")
+			return
+		}
+		fmt.Println(session)
+		fmt.Fprintf(w, "Sucessfull login")
 
 		//LOGIC FOR COOKIE
 		// expirationTime := time.Now().Add(time.Minute * 5)
@@ -146,15 +158,17 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Invalid Email")
 }
 func UserProfileShow(w http.ResponseWriter, r *http.Request) {
+
 	session, bool_validSession := validSession(r)
 	if !bool_validSession {
 		return
 	}
+	fmt.Println(session.Values["authenticated"])
 	db = dal.GetDB()
 	var user models.Users
-	errIfNoRows := db.QueryRow("select age, gender, height, weight, health_goal, profile_photo from public.user_profile_details where user_id=$1", session.Values["userID"]).Scan( &user.Age, &user.Gender, &user.Height, &user.Weight, &user.HealthGoal, &user.ProfilePhoto)
-	errIfZeroRows := db.QueryRow("select email, fullname from public.user_registration_details where user_id=$1", session.Values["userID"]).Scan( &user.Email, &user.FullName)
-	if errIfNoRows == nil || errIfZeroRows == nil{
+	errIfNoRows := db.QueryRow("select age, gender, height, weight, health_goal, profile_photo from public.user_profile_details where user_id=$1", session.Values["userID"]).Scan(&user.Age, &user.Gender, &user.Height, &user.Weight, &user.HealthGoal, &user.ProfilePhoto)
+	errIfZeroRows := db.QueryRow("select email, fullname from public.user_registration_details where user_id=$1", session.Values["userID"]).Scan(&user.Email, &user.FullName)
+	if errIfNoRows == nil || errIfZeroRows == nil {
 		user.UserID, _ = session.Values["userID"].(int)
 		user_data, _ := json.MarshalIndent(user, "", "  ")
 		fmt.Fprint(w, string(user_data))
@@ -245,13 +259,20 @@ func AddWaterDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	session, err := store.Get(r, "session-name")
+
+	session, err := store.Get(r, "val")
 	if err != nil {
 		fmt.Println("Error no session Found !")
 		return
 	}
+	fmt.Println(session.Values)
 	// Revoke users authentication
 	fmt.Println("Session found")
 	session.Values["authenticated"] = false
-	session.Save(r, w)
+
+	err = session.Save(r, w)
+	if err != nil {
+		fmt.Println("error in storing sessions")
+	}
+	fmt.Println(session.Values)
 }

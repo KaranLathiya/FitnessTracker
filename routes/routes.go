@@ -1,11 +1,16 @@
 package routes
 
 import (
+	// "encoding/json"
 	"karanlathiya/FitnessTracker/handlers"
+	"karanlathiya/FitnessTracker/models"
 	"net/http"
 
 	"github.com/go-chi/chi"
 )
+
+var err models.MyError
+
 
 func handleCORS(handler http.HandlerFunc) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +44,11 @@ func NewRouter() *chi.Mux {
 
 	r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(405)
-		w.Write([]byte("method is not valid"))
+		w.Write([]byte("wrong method"))
+		// err.Code=404
+
+		// user_data, _ := json.MarshalIndent(err, "", "  ")
+		// w.Write(user_data)
 	})
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(405)

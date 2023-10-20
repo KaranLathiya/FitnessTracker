@@ -48,6 +48,11 @@ type Water struct {
 	Date        time.Time `json:"date"`
 }
 
+type MyError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 // BreakFast        string `json:"BreakFast"`
 // 	Launch           string `json:"launch"`
 // 	Snacks           string `json:"snacks"`
