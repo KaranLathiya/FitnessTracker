@@ -24,20 +24,20 @@ var db *sql.DB
 
 var (
 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-	// aes256Key, _ = generateAESKey(32)
-	aes256Key = []byte("super-secret-key")
+	aes256Key, _ = generateAESKey(32)
+	// aes256Key = []byte("super-secret-key")
 	store    = sessions.NewCookieStore(aes256Key)
 	validate = validator.New()
 )
 
-// func generateAESKey(keyLength int) ([]byte, error) {
-// 	key := make([]byte, keyLength)
-// 	_, err := rand.Read(key)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return key, nil
-// }
+func generateAESKey(keyLength int) ([]byte, error) {
+	key := make([]byte, keyLength)
+	_, err := rand.Read(key)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
+}
 
 func validSession(r *http.Request) (*sessions.Session, bool) {
 	session, err := store.Get(r, "val")
@@ -58,7 +58,9 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 	if err != nil {
 		return bodyData, err
 	}
+	// fmt.Println(string(body))
 	json.Unmarshal(body, &bodyData)
+
 	err = validate.Struct(bodyData)
 	if err != nil {
 		fmt.Println("Error in passing data through json")
@@ -67,7 +69,7 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 	fmt.Println(bodyData)
 	return bodyData, err
 }
-func UserProfileAdd(w http.ResponseWriter, r *http.Request) {
+func AddUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 
 	var user models.Users
 	db = dal.GetDB()
@@ -189,14 +191,16 @@ func AddExerciseDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := db.Exec(
-		"INSERT INTO public.exercise_details( user_id, exercise_type, duration, calories_burned, date) VALUES ( $1, $2, $3, $4, $5);", session.Values["userID"], exercise.ExerciseType, exercise.Duration, exercise.CaloriesBurned, time.Now().Format("2006-01-02")); err != nil {
-		fmt.Fprint(w, err)
+	RowsAffected, err := dal.MustExec("INSERT INTO public.exercise_details( user_id, exercise_type, duration, calories_burned, date) VALUES ( $1, $2, $3, $4, $5);", session.Values["userID"], exercise.ExerciseType, exercise.Duration, exercise.CaloriesBurned, time.Now().Format("2006-01-02"))
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	fmt.Println(RowsAffected)
 	fmt.Fprintf(w, "User details Successfully added")
 
 }
+
 func AddMealDetails(w http.ResponseWriter, r *http.Request) {
 	session, bool_validSession := validSession(r)
 	if !bool_validSession {
@@ -209,13 +213,14 @@ func AddMealDetails(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	if _, err := db.Exec(
-		"INSERT INTO public.meal_details( user_id, meal_type, ingredients, calories_consumed, date) VALUES ( $1, $2, $3, $4, $5);", session.Values["userID"], meal.MealType, meal.Ingeredients, meal.CaloriesConsumed, time.Now().Format("2006-01-02")); err != nil {
-		fmt.Fprint(w, err)
+	RowsAffected, err := dal.MustExec(
+		"INSERT INTO public.meal_details( user_id, meal_type, ingredients, calories_consumed, date) VALUES ( $1, $2, $3, $4, $5);", session.Values["userID"], meal.MealType, meal.Ingeredients, meal.CaloriesConsumed, time.Now().Format("2006-01-02"))
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	fmt.Println(RowsAffected)
 	fmt.Fprintf(w, "User details Successfully added")
-
 }
 func AddWeightDetails(w http.ResponseWriter, r *http.Request) {
 	session, bool_validSession := validSession(r)
@@ -229,11 +234,13 @@ func AddWeightDetails(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	if _, err := db.Exec(
-		"INSERT INTO public.weight_details( user_id, daily_weight, date) VALUES ( $1, $2, $3);", session.Values["userID"], weight.DailyWeight, time.Now().Format("2006-01-02")); err != nil {
-		fmt.Fprint(w, err)
+	RowsAffected, err := dal.MustExec(
+		"INSERT INTO public.weight_details( user_id, daily_weight, date) VALUES ( $1, $2, $3);", session.Values["userID"], weight.DailyWeight, time.Now().Format("2006-01-02"))
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	fmt.Println(RowsAffected)
 	fmt.Fprintf(w, "User details Successfully added")
 
 }
@@ -249,13 +256,137 @@ func AddWaterDetails(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	if _, err := db.Exec(
-		"INSERT INTO public.water_details( user_id, water_intake, date) VALUES ( $1, $2, $3);", session.Values["userID"], water.WaterIntake, time.Now().Format("2006-01-02")); err != nil {
-		fmt.Fprint(w, err)
+	RowsAffected, err := dal.MustExec("INSERT INTO public.water_details( user_id, water_intake, date) VALUES ( $1, $2, $3);", session.Values["userID"], water.WaterIntake, time.Now().Format("2006-01-02"))
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	fmt.Println(RowsAffected)
 	fmt.Fprintf(w, "User details Successfully added")
 
+}
+func EditUserProfileDetails(w http.ResponseWriter, r *http.Request) {
+	session, bool_validSession := validSession(r)
+	if !bool_validSession {
+		return
+	}
+	var user models.Users
+	_, err := dataReadFromBody(r, &user)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var RowsAffected int64
+	if r.Method == "PUT" {
+		RowsAffected, err = dal.MustExec("UPDATE public.user_profile_details set  age=$2, gender=$3, height=$4, weight=$5, health_goal=$6, profile_photo=$7  where user_id=$1 ;", session.Values["userID"], user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
+	} else if r.Method == "DELETE" {
+		RowsAffected, err = dal.MustExec("DELETE FROM public.user_profile_details where user_id=$1 ;", session.Values["userID"])
+	}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(RowsAffected)
+	fmt.Fprintf(w, "User details Successfully updated")
+}
+func EditMealDetails(w http.ResponseWriter, r *http.Request) {
+	session, bool_validSession := validSession(r)
+	if !bool_validSession {
+		return
+	}
+	var meal models.Meal
+	_, err := dataReadFromBody(r, &meal)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var RowsAffected int64
+	if r.Method == "PUT" {
+		RowsAffected, err = dal.MustExec("UPDATE public.meal_details set ingredients=$1, calories_consumed=$2  where user_id=$3 AND date=$4 AND meal_type=$5;", meal.Ingeredients, meal.CaloriesConsumed, session.Values["userID"], meal.Date, meal.MealType)
+	} else if r.Method == "DELETE" {
+		RowsAffected, err = dal.MustExec("DELETE FROM public.meal_details where user_id=$1 AND date=$2 AND meal_type=$3;", session.Values["userID"], meal.Date, meal.MealType)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(RowsAffected)
+	fmt.Fprintf(w, "User details Successfully updated")
+}
+
+func EditExerciseDetails(w http.ResponseWriter, r *http.Request) {
+	session, bool_validSession := validSession(r)
+	if !bool_validSession {
+		return
+	}
+	var exercise models.Exercise
+	_, err := dataReadFromBody(r, &exercise)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var RowsAffected int64
+	if r.Method == "PUT" {
+		RowsAffected, err = dal.MustExec("UPDATE public.exercise_details set duration=$1, calories_burned=$2  where user_id=$3 AND date=$4 AND exercise_type=$5;", exercise.Duration, exercise.CaloriesBurned, session.Values["userID"], exercise.Date, exercise.ExerciseType)
+	} else if r.Method == "DELETE" {
+		RowsAffected, err = dal.MustExec("DELETE FROM public.exercise_details where user_id=$1 AND date=$2 AND exercise_type=$3;", session.Values["userID"], exercise.Date, exercise.ExerciseType)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(RowsAffected)
+	fmt.Fprintf(w, "User details Successfully updated")
+}
+
+func EditWeightDetails(w http.ResponseWriter, r *http.Request) {
+	session, bool_validSession := validSession(r)
+	if !bool_validSession {
+		return
+	}
+	var weight models.Weight
+	_, err := dataReadFromBody(r, &weight)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var RowsAffected int64
+	if r.Method == "PUT" {
+		RowsAffected, err = dal.MustExec("UPDATE public.weight_details set daily_weight=$2  where user_id=$2 AND date=$3 ;", weight.DailyWeight, session.Values["userID"], weight.Date)
+	} else if r.Method == "DELETE" {
+		RowsAffected, err = dal.MustExec("DELETE FROM public.weight_details where user_id=$1 AND date=$2 ;", session.Values["userID"], weight.Date)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(RowsAffected)
+	fmt.Fprintf(w, "User details Successfully updated")
+}
+
+func EditWaterDetails(w http.ResponseWriter, r *http.Request) {
+	session, bool_validSession := validSession(r)
+	if !bool_validSession {
+		return
+	}
+	var water models.Water
+	_, err := dataReadFromBody(r, &water)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var RowsAffected int64
+	if r.Method == "PUT" {
+		RowsAffected, err = dal.MustExec("UPDATE public.water_details set water_intake=$2  where user_id=$2 AND date=$3 ;", water.WaterIntake, session.Values["userID"], water.Date)
+	} else if r.Method == "DELETE" {
+		RowsAffected, err = dal.MustExec("DELETE FROM public.water_details where user_id=$1 AND date=$2 ;", session.Values["userID"], water.Date)
+	}
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(RowsAffected)
+	fmt.Fprintf(w, "User details Successfully updated")
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {

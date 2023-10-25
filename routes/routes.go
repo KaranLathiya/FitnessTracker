@@ -33,13 +33,30 @@ func handleCORS(handler http.HandlerFunc) func(http.ResponseWriter, *http.Reques
 
 func NewRouter() *chi.Mux {
 	r := chi.NewRouter()
+
 	r.Post("/user/signup", handleCORS(handlers.UserSignup))
 	r.Post("/user/login", handleCORS(handlers.UserLogin))
-	r.Get("/user/profile/add", handleCORS(handlers.UserProfileAdd))
+	
+	r.Get("/user/profile/add", handleCORS(handlers.AddUserProfileDetails))
+	r.Get("/user/exercise/add", handleCORS(handlers.AddExerciseDetails))
+	r.Get("/user/meal/add", handleCORS(handlers.AddMealDetails))
+	r.Get("/user/weight/add", handleCORS(handlers.AddWeightDetails))
+	r.Get("/user/water/add", handleCORS(handlers.AddWaterDetails))
+
 	r.Get("/user/profile/show", handleCORS(handlers.UserProfileShow))
-	r.Get("/user/exercise", handleCORS(handlers.AddExerciseDetails))
-	r.Get("/user/meal", handleCORS(handlers.AddMealDetails))
-	r.Get("/user/weight", handleCORS(handlers.AddMealDetails))
+	
+	r.Put("/user/profile/update", handleCORS(handlers.EditUserProfileDetails))
+	r.Put("/user/exercise/update", handleCORS(handlers.EditExerciseDetails))
+	r.Put("/user/meal/update", handleCORS(handlers.EditMealDetails))
+	r.Put("/user/weight/update", handleCORS(handlers.EditWeightDetails))
+	r.Put("/user/water/update", handleCORS(handlers.EditWaterDetails))
+	
+	r.Delete("/user/profile/delete", handleCORS(handlers.EditUserProfileDetails))
+	r.Delete("/user/exercise/delete", handleCORS(handlers.EditExerciseDetails))
+	r.Delete("/user/meal/delete", handleCORS(handlers.EditMealDetails))
+	r.Delete("/user/weight/delete", handleCORS(handlers.EditWeightDetails))
+	r.Delete("/user/water/delete", handleCORS(handlers.EditWaterDetails))
+	
 	r.Get("/user/logout", handleCORS(handlers.Logout))
 
 	r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {

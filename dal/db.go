@@ -32,11 +32,19 @@ func LogAndQuery(db *sql.DB, query string, args ...interface{}) (*sql.Rows, erro
 	return db.Query(query, args...)
 }
 
-func MustExec(db *sql.DB, query string, args ...interface{}) {
-	_, err := db.Exec(query, args...)
+func MustExec(query string, args ...interface{}) (int64, error) {
+	db := GetDB()
+	result, err := db.Exec(query, args...)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
+	RowsAffected, err := result.RowsAffected()
+	if err != nil {
+		fmt.Println("RowsAffected Error", err)
+		return 0,err
+	}
+	return RowsAffected,err
+
 }
 func InitDB(db *sql.DB) {
 	// MustExec(db, "CREATE TABLE IF NOT EXISTS public.user_registration_details (   user_id INT8 NOT NULL DEFAULT unique_rowid(), email VARCHAR NOT NULL, password VARCHAR NOT NULL, CONSTRAINT user_registration_details_pk PRIMARY KEY (user_id ASC))")
