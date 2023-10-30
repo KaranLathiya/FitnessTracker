@@ -22,7 +22,7 @@ func main() {
 	db, err := dal.Connect()
 	errors.CheckErr(err)
 	dal.InitDB(db)
-
+	
 	//Routing
 	r := routes.NewRouter()
 	http.Handle("/", r)
