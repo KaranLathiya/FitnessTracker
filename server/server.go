@@ -8,12 +8,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"github.com/joho/godotenv"
 	// "github.com/go-chi/chi/v5/middleware"
 )
 
 const defaultPort = "8080"
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Some error occured. Err: %s", err)
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
@@ -22,7 +27,7 @@ func main() {
 	db, err := dal.Connect()
 	errors.CheckErr(err)
 	dal.InitDB(db)
-	
+
 	//Routing
 	r := routes.NewRouter()
 	http.Handle("/", r)

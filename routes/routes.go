@@ -9,61 +9,77 @@ import (
 	"github.com/go-chi/chi"
 )
 
+// func handleCORS(handler http.HandlerFunc) func(http.ResponseWriter, *http.Request) {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		// Set CORS headers
+// 		w.Header().Set("Access-Control-Allow-Origin", "*")
+// 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+// 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+// 		w.Header().Set("Access-Control-Allow-Credentials", "true")
+// 		w.Header().Set("Content-Type", "json/application")
+// 		// Handle preflight requests
+// 		if r.Method == http.MethodOptions {
+// 			w.WriteHeader(http.StatusNoContent)
+// 			return
+// 		}
 
-func handleCORS(handler http.HandlerFunc) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Content-Type", "json/application")
-		// Handle preflight requests
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		// Call the original handler
-		handler(w, r)
-	}
-}
+// 		// Call the original handler
+// 		handler(w, r)
+// 	}
+// }
 
 func NewRouter() *chi.Mux {
 	r := chi.NewRouter()
+	r.Route("/", func(r chi.Router) {
 
-	r.Post("/user/signup", handleCORS(handlers.UserSignup))
-	r.Post("/user/login", handleCORS(handlers.UserLogin))
-	
-	r.Get("/user/profile/add", handleCORS(handlers.AddUserProfileDetails))
-	r.Get("/user/exercise/add", handleCORS(handlers.AddExerciseDetails))
-	r.Get("/user/meal/add", handleCORS(handlers.AddMealDetails))
-	r.Get("/user/weight/add", handleCORS(handlers.AddWeightDetails))
-	r.Get("/user/water/add", handleCORS(handlers.AddWaterDetails))
+		r.Use(handlers.HandleCORS)
+		r.Post("/signup", handlers.UserSignup)
+		r.Post("/login", handlers.UserLogin)
 
-	r.Get("/user/profile/show", handleCORS(handlers.UserProfileShow))
-	
-	r.Put("/user/profile/update", handleCORS(handlers.EditUserProfileDetails))
-	r.Put("/user/exercise/update", handleCORS(handlers.EditExerciseDetails))
-	r.Put("/user/meal/update", handleCORS(handlers.EditMealDetails))
-	r.Put("/user/weight/update", handleCORS(handlers.EditWeightDetails))
-	r.Put("/user/water/update", handleCORS(handlers.EditWaterDetails))
-	
-	r.Delete("/user/profile/delete", handleCORS(handlers.EditUserProfileDetails))
-	r.Delete("/user/exercise/delete", handleCORS(handlers.EditExerciseDetails))
-	r.Delete("/user/meal/delete", handleCORS(handlers.EditMealDetails))
-	r.Delete("/user/weight/delete", handleCORS(handlers.EditWeightDetails))
-	r.Delete("/user/water/delete", handleCORS(handlers.EditWaterDetails))
-	
-	r.Get("/user/logout", handleCORS(handlers.Logout))
+		r.Route("/user", func(r chi.Router) {
+			r.Use(handlers.Authentication)
+			r.Route("/profile", func(r chi.Router) {
+				r.Put("/", handlers.UpdateUserProfileDetails)
+				r.Get("/", handlers.FetchUserProfileDetails)
+			})
+		
+			r.Route("/exercise", func(r chi.Router) {
+				r.Post("/", handlers.AddExerciseDetails)
+				r.Get("/", handlers.FetchExerciseDetails)
+				r.Put("/", handlers.UpdateExerciseDetails)
+				r.Delete("/", handlers.DeleteExerciseDetails)
+			})
+			r.Route("/meal", func(r chi.Router) {
+				r.Post("/", handlers.AddMealDetails)
+				r.Get("/", handlers.FetchMealDetails)
+				r.Put("/", handlers.UpdateMealDetails)
+				r.Delete("/", handlers.DeleteMealDetails)
+			})
+			r.Route("/weight", func(r chi.Router) {
+				r.Post("/", handlers.AddWeightDetails)
+				r.Get("/", handlers.FetchWeightDetails)
+				r.Put("/", handlers.UpdateWeightDetails)
+				r.Delete("/", handlers.DeleteWeightDetails)
+			})
+			r.Route("/water", func(r chi.Router) {
+				r.Post("/", handlers.AddWaterDetails)
+				r.Get("/", handlers.FetchWaterDetails)
+				r.Put("/", handlers.UpdateWaterDetails)
+				r.Delete("/", handlers.DeleteWaterDetails)
+			})
+			
 
-	r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(405)
-		w.Write([]byte("wrong method"))
-	})
-	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(404)
-		w.Write([]byte("route does not exist"))
+		})
+
+		r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(405)
+			w.Write([]byte("wrong method"))
+		})
+		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(404)
+			w.Write([]byte("route does not exist"))
+		})
+
 	})
 
 	return r

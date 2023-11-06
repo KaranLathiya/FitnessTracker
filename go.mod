@@ -16,8 +16,10 @@ require (
 )
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gorilla/sessions v1.2.1
+	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.14.0
 )

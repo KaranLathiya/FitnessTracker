@@ -3,9 +3,12 @@ package dal
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 	"sync"
 
 	_ "github.com/cockroachdb/cockroach-go/crdb"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -13,10 +16,20 @@ var once sync.Once
 var db *sql.DB
 
 func Connect() (*sql.DB, error) {
-
-	var err error
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Some error occured. Err: %s", err)
+	}
+	dbname := os.Getenv("DBNAME")
+	user := os.Getenv("USER")
+	userpassword := os.Getenv("USERPASSWORD")
+	if dbname == "" || user == "" || userpassword == "" {
+		fmt.Println("error in data fetching from env file")
+	}
+	// var err error
 	once.Do(func() {
-		connection_string := "postgresql://User:2a2dwrcFnaHmyS6I5mvE_A@solar-ape-6502.8nk.cockroachlabs.cloud:26257/fitnessdb?sslmode=verify-full"
+		connection_string := "postgresql://"+user+":"+userpassword+"@solar-ape-6502.8nk.cockroachlabs.cloud:26257/"+dbname+"?sslmode=verify-full"
+		// fmt.Println(connection_string)
 		db, err = sql.Open("postgres", connection_string)
 		if err != nil {
 			fmt.Println("Database Connection err", err)
@@ -33,7 +46,7 @@ func LogAndQuery(db *sql.DB, query string, args ...interface{}) (*sql.Rows, erro
 }
 
 func MustExec(query string, args ...interface{}) (int64, error) {
-	db := GetDB()
+	db = GetDB()
 	result, err := db.Exec(query, args...)
 	if err != nil {
 		return 0, err
@@ -41,9 +54,9 @@ func MustExec(query string, args ...interface{}) (int64, error) {
 	RowsAffected, err := result.RowsAffected()
 	if err != nil {
 		fmt.Println("RowsAffected Error", err)
-		return 0,err
+		return 0, err
 	}
-	return RowsAffected,err
+	return RowsAffected, err
 
 }
 func InitDB(db *sql.DB) {

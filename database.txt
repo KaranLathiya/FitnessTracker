@@ -1,0 +1,88 @@
+-- public.user_details definition
+
+-- Drop table
+
+-- DROP TABLE public.user_details;
+
+CREATE TABLE public.user_details (
+	user_id VARCHAR NOT NULL DEFAULT unique_rowid(),
+	email VARCHAR NOT NULL,
+	password VARCHAR NOT NULL,
+	fullname VARCHAR NOT NULL,
+	age INT8 NULL,
+	gender VARCHAR NULL,
+	height INT8 NULL,
+	weight INT8 NULL,
+	health_goal VARCHAR NULL,
+	profile_photo VARCHAR NULL,
+	CONSTRAINT user_details_pk PRIMARY KEY (user_id ASC),
+	UNIQUE INDEX user_details_un (email ASC)
+);
+
+
+-- public.exercise_details definition
+
+-- Drop table
+
+-- DROP TABLE public.exercise_details;
+
+CREATE TABLE public.exercise_details (
+	user_id VARCHAR NOT NULL,
+	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
+	exercise_type VARCHAR NOT NULL,
+	duration INT8 NOT NULL,
+	calories_burned INT8 NOT NULL,
+	date DATE NOT NULL,
+	CONSTRAINT exercise_details_pk PRIMARY KEY (user_id ASC, exercise_type ASC, date ASC),
+	CONSTRAINT exercise_details_fk FOREIGN KEY (user_id) REFERENCES public.user_details(user_id),
+	CONSTRAINT check_exercise_type CHECK (exercise_type IN ('Weight lifting':::STRING, 'Walking':::STRING, 'Running':::STRING, 'Gym':::STRING, 'Yoga':::STRING))
+);
+
+
+-- public.meal_details definition
+
+-- Drop table
+
+-- DROP TABLE public.meal_details;
+
+CREATE TABLE public.meal_details (
+	user_id VARCHAR NOT NULL,
+	rowid INT8 NOT VISIBLE NOT NULL DEFAULT unique_rowid(),
+	meal_type VARCHAR NOT NULL,
+	ingredients VARCHAR NOT NULL,
+	calories_consumed INT8 NOT NULL,
+	date DATE NOT NULL,
+	CONSTRAINT meal_details_pk PRIMARY KEY (user_id ASC, meal_type ASC, date ASC),
+	CONSTRAINT meal_details_fk FOREIGN KEY (user_id) REFERENCES public.user_details(user_id),
+	CONSTRAINT check_meal_type CHECK (meal_type IN ('Breakfast':::STRING, 'Launch':::STRING, 'Snacks':::STRING, 'Dinner':::STRING))
+);
+
+
+-- public.water_details definition
+
+-- Drop table
+
+-- DROP TABLE public.water_details;
+
+CREATE TABLE public.water_details (
+	user_id VARCHAR NOT NULL,
+	water_intake INT8 NOT NULL,
+	date DATE NOT NULL,
+	CONSTRAINT newtable_pk PRIMARY KEY (user_id ASC, date ASC),
+	CONSTRAINT newtable_fk FOREIGN KEY (user_id) REFERENCES public.user_details(user_id)
+);
+
+
+-- public.weight_details definition
+
+-- Drop table
+
+-- DROP TABLE public.weight_details;
+
+CREATE TABLE public.weight_details (
+	user_id VARCHAR NOT NULL,
+	daily_weight INT8 NOT NULL,
+	date DATE NOT NULL,
+	CONSTRAINT weight_details_pk PRIMARY KEY (user_id ASC, date ASC),
+	CONSTRAINT weight_details_fk FOREIGN KEY (user_id) REFERENCES public.user_details(user_id)
+);
