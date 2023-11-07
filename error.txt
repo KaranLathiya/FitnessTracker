@@ -1,0 +1,48 @@
+userid not passed or not valid
+{
+    "code": 498,
+    "message": "Invalid token"
+} 
+
+wrong emailid
+{
+    "code": 401,
+    "message": "Email id doesn't exist"
+}
+
+
+wrong password
+{
+    "code": 401,
+    "message": "Wrong password"
+}
+
+some field missing in request body
+{
+    "code": 400,
+    "message": "Some required data was left out"
+}
+
+check constraint error
+{
+    "code": 400,
+    "message": "This record contains inconsistent or out-of-range data"
+}
+
+same data already present
+{
+    "code": 409,
+    "message": "This record contains duplicated data that conflicts with what is already in the database"
+}
+
+database error
+{
+    "code": 500,
+    "message": "Internal server error"
+}
+
+if all set 
+{
+    "code": 200,
+    "message": ""
+}

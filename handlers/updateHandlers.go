@@ -11,7 +11,6 @@ import (
 
 func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	
-	
 	var user models.Users
 	var RowsAffected int64
 		_, err = dataReadFromBody(r, &user)

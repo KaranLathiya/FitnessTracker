@@ -29,7 +29,7 @@ type Meal struct {
 }
 
 type Weight struct {
-	DailyWeight string `json:"dailyWeight" validate:"required" `
+	DailyWeight int `json:"dailyWeight" validate:"required" `
 	Date        string `json:"date"`
 }
 
@@ -47,9 +47,11 @@ type UserID struct {
 	UserID string `json:"userId"  validate:"required" `
 }
 
+
 // BreakFast        string `json:"BreakFast"`
 // 	Launch           string `json:"launch"`
 // 	Snacks           string `json:"snacks"`
 // 	Dinner           string `json:"dinner"`
 // 	WaterConsumption int    `json:"waterConsumption"`
 // 	CaloriesTaken    int    `json:"caloriesTaken"`
+

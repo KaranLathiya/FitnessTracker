@@ -1,0 +1,38 @@
+constraints
+
+//user_details table
+
+user_details	check_age	CHECK	CHECK (((age > 0) AND (age < 130)))	true
+user_details	check_gender	CHECK	CHECK ((gender IN ('Male'::STRING, 'Female'::STRING, 'Other'::STRING)))	true
+user_details	check_health_goal	CHECK	CHECK ((health_goal IN ('Weight_loss'::STRING, 'Weight_gain'::STRING, 'Muscle_building'::STRING, 'Maintain_body'::STRING)))	true
+user_details	check_height	CHECK	CHECK (((height > 50) AND (height < 300)))	true
+user_details	check_weight	CHECK	CHECK (((weight > 2) AND (weight < 700)))	true
+user_details	user_details_pk	PRIMARY KEY	PRIMARY KEY (user_id ASC)	true
+user_details	user_details_un	UNIQUE	UNIQUE (email ASC)	true
+
+//meal_details table
+
+meal_details	check_calories_consumed	CHECK	CHECK (((calories_consumed > 0) AND (calories_consumed < 20000)))	true
+meal_details	meal_details_check	CHECK	CHECK ((meal_type IN ('Breakfast'::STRING, 'Lunch'::STRING, 'Snacks'::STRING, 'Dinner'::STRING)))	true
+meal_details	meal_details_fk	FOREIGN KEY	FOREIGN KEY (user_id) REFERENCES user_details(user_id)	true
+meal_details	meal_details_pk	PRIMARY KEY	PRIMARY KEY (user_id ASC, meal_type ASC, date ASC)	true
+
+//exercise_details table
+
+exercise_details	check_calories_burned	CHECK	CHECK (((calories_burned > 0) AND (calories_burned < 20000)))	true
+exercise_details	check_duration	CHECK	CHECK (((duration > 0) AND (duration < 1440)))	true
+exercise_details	exercise_details_check	CHECK	CHECK ((exercise_type IN ('Weight_lifting'::STRING, 'Walking'::STRING, 'Running'::STRING, 'Gym'::STRING, 'Yoga'::STRING)))	true
+exercise_details	exercise_details_fk	FOREIGN KEY	FOREIGN KEY (user_id) REFERENCES user_details(user_id)	true
+exercise_details	exercise_details_pk	PRIMARY KEY	PRIMARY KEY (user_id ASC, exercise_type ASC, date ASC)	true
+
+//water_details table
+
+water_details	check_water_intake	CHECK	CHECK (((water_intake > 0) AND (water_intake < 20)))	true
+water_details	newtable_fk	FOREIGN KEY	FOREIGN KEY (user_id) REFERENCES user_details(user_id)	true
+water_details	newtable_pk	PRIMARY KEY	PRIMARY KEY (user_id ASC, date ASC)	true
+
+//weight_details table
+
+weight_details	check_daily_weight	CHECK	CHECK (((daily_weight > 2) AND (daily_weight < 700)))	true
+weight_details	weight_details_fk	FOREIGN KEY	FOREIGN KEY (user_id) REFERENCES user_details(user_id)	true
+weight_details	weight_details_pk	PRIMARY KEY	PRIMARY KEY (user_id ASC, date ASC)	true

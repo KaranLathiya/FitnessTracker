@@ -68,7 +68,8 @@ func NewRouter() *chi.Mux {
 				r.Delete("/", handlers.DeleteWaterDetails)
 			})
 			
-
+			r.Get("/water-intake-of-month", handlers.FetchWaterIntakeMonthly)
+			r.Get("/fetchall", handlers.FetchAllDetails)
 		})
 
 		r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {

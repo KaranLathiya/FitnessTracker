@@ -45,11 +45,12 @@ var ok bool
 func Authentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		UserID.UserID, ok = Validation(r)
+		UserID.UserID, ok = validation(r)
 		if !ok {
 			errors.MessageShow(498, "Invalid token", w)
 			return
 		}
+		db = dal.GetDB()
 		rows, err := db.Query("select user_id from public.user_details where user_id=$1", UserID.UserID)
 		if err != nil {
 			errors.MessageShow(500, "Internal Server Error", w)
@@ -57,11 +58,11 @@ func Authentication(next http.Handler) http.Handler {
 		}
 		i := 0
 		for rows.Next() {
-			err := rows.Scan(&UserID.UserID)
-			if err != nil {
-				fmt.Println("Error scanning row:", err)
-				return
-			}
+			// err := rows.Scan(&UserID.UserID)
+			// if err != nil {
+			// 	fmt.Println("Error scanning row:", err)
+			// 	return
+			// }
 			i += 1
 		}
 		defer rows.Close()
@@ -72,7 +73,7 @@ func Authentication(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-func Validation(r *http.Request) (string, bool) {
+func validation(r *http.Request) (string, bool) {
 	UserID_slice, ok := r.Header["Authorization"]
 	if !ok {
 		return "", false
