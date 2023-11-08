@@ -31,6 +31,6 @@ func main() {
 	//Routing
 	r := routes.NewRouter()
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe("127.0.0.1:"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 	defer db.Close()
 }

@@ -10,7 +10,6 @@ import (
 )
 
 func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
-	
 	var user models.Users
 	var RowsAffected int64
 		_, err = dataReadFromBody(r, &user)
@@ -34,8 +33,6 @@ func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	errors.MessageShow(200, "User details Successfully updated", w)
 }
 func UpdateMealDetails(w http.ResponseWriter, r *http.Request) {
-	
-
 	var meal models.Meal
 	_, err = dataReadFromBody(r, &meal)
 	if err != nil {
@@ -60,8 +57,6 @@ func UpdateMealDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateExerciseDetails(w http.ResponseWriter, r *http.Request) {
-	
-
 	var exercise models.Exercise
 	_, err = dataReadFromBody(r, &exercise)
 	if err != nil {
@@ -85,8 +80,6 @@ func UpdateExerciseDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateWeightDetails(w http.ResponseWriter, r *http.Request) {
-	
-
 	var weight models.Weight
 	_, err = dataReadFromBody(r, &weight)
 	if err != nil {
@@ -110,8 +103,6 @@ func UpdateWeightDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateWaterDetails(w http.ResponseWriter, r *http.Request) {
-	
-
 	var water models.Water
 	_, err = dataReadFromBody(r, &water)
 	if err != nil {

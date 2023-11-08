@@ -11,7 +11,6 @@ import (
 
 func AddUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	
-	
 	var user models.Users
 	db = dal.GetDB()
 

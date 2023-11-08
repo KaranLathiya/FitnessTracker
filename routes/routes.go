@@ -45,31 +45,32 @@ func NewRouter() *chi.Mux {
 		
 			r.Route("/exercise", func(r chi.Router) {
 				r.Post("/", handlers.AddExerciseDetails)
-				r.Get("/", handlers.FetchExerciseDetails)
+				// r.Get("/", handlers.FetchExerciseDetails)
 				r.Put("/", handlers.UpdateExerciseDetails)
 				r.Delete("/", handlers.DeleteExerciseDetails)
 			})
 			r.Route("/meal", func(r chi.Router) {
 				r.Post("/", handlers.AddMealDetails)
-				r.Get("/", handlers.FetchMealDetails)
+				// r.Get("/", handlers.FetchMealDetails)
 				r.Put("/", handlers.UpdateMealDetails)
 				r.Delete("/", handlers.DeleteMealDetails)
 			})
 			r.Route("/weight", func(r chi.Router) {
 				r.Post("/", handlers.AddWeightDetails)
-				r.Get("/", handlers.FetchWeightDetails)
+				// r.Get("/", handlers.FetchWeightDetails)
 				r.Put("/", handlers.UpdateWeightDetails)
 				r.Delete("/", handlers.DeleteWeightDetails)
 			})
 			r.Route("/water", func(r chi.Router) {
 				r.Post("/", handlers.AddWaterDetails)
-				r.Get("/", handlers.FetchWaterDetails)
+				// r.Get("/", handlers.FetchWaterDetails)
 				r.Put("/", handlers.UpdateWaterDetails)
 				r.Delete("/", handlers.DeleteWaterDetails)
 			})
-			
+			r.Get("/yearly-weight-details", handlers.FetchYearlyWeightDetails)
+			r.Get("/yearly-caloriesburned-details", handlers.FetchYearlyCaloriesBurnedDetails)
 			r.Get("/water-intake-of-month", handlers.FetchWaterIntakeMonthly)
-			r.Get("/fetchall", handlers.FetchAllDetails)
+			r.Get("/alldetails", handlers.FetchAllDetails)
 		})
 
 		r.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {

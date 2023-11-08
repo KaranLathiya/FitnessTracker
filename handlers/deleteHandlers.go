@@ -25,7 +25,7 @@ func DeleteMealDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(RowsAffected)
-	errors.MessageShow(200, "User details Successfully updated", w)
+	errors.MessageShow(200, "User details Successfully deleted", w)
 }
 
 func DeleteExerciseDetails(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func DeleteExerciseDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(RowsAffected)
-	errors.MessageShow(200, "User details Successfully updated", w)
+	errors.MessageShow(200, "User details Successfully deleted", w)
 }
 
 func DeleteWeightDetails(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +65,7 @@ func DeleteWeightDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(RowsAffected)
-	errors.MessageShow(200, "User details Successfully updated", w)
+	errors.MessageShow(200, "User details Successfully deleted", w)
 }
 
 func DeleteWaterDetails(w http.ResponseWriter, r *http.Request) {
@@ -83,5 +83,5 @@ func DeleteWaterDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(RowsAffected)
-	errors.MessageShow(200, "User details Successfully updated", w)
+	errors.MessageShow(200, "User details Successfully deleted", w)
 }

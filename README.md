@@ -1,4 +1,12 @@
 
+# FitnessTracker
+
+Fitness track website where a user can track their daily
+exercises, meals, weight, and set of personal health goals.
+
+Created using Go + cockroachdb.
+
+
 ## Run Locally
 
 Clone the project
@@ -13,8 +21,6 @@ Install Go version 1.21
   go install 1.21 
 ```
 
-
-
 Install dependencies
 
 ```bash
@@ -26,7 +32,6 @@ Start the server
 ```bash
   go run server/server.go
 ```
-
 
 # Routing
 
@@ -52,7 +57,6 @@ To fetch profile details for user --GET
 
 ## For Meal
 
-To fetch meal details of user --GET
 
 To add meal details of user --POST
 
@@ -64,7 +68,6 @@ To delete meal details of user --DELETE
 
 ## For Exercise
 
-To fetch exercise details of user --GET
 
 To add exercise details of user --POST
 
@@ -76,8 +79,6 @@ To delete exercise details of user --DELETE
 
 ## For Weight
 
-To fetch weight details of user --GET
-
 To add weight details of user --POST
 
 To update weight details of user --PUT
@@ -88,8 +89,6 @@ To delete weight details of user --DELETE
 
 ## For Water
 
-To fetch water details of user --GET
-
 To add water details of user --POST
 
 To update water details of user --PUT
@@ -97,3 +96,27 @@ To update water details of user --PUT
 To delete water details of user --DELETE
 
     http://localhost:8080/user/water
+
+## For All details by date 
+
+To fetch monthly water details of user --GET
+     
+    http://localhost:8080/user/alldetails
+
+## For WaterIntake Monthly 
+
+To fetch monthly water details of user --GET
+     
+    http://localhost:8080/user/water-intake-of-month
+
+## For Weight Details Yearly 
+
+To fetch yearly Weight Details of user --GET
+     
+    http://localhost:8080/user/yearly-weight-details
+
+## For  CaloriesBurned Details Yearly 
+
+To fetch yearly CaloriesBurned details of user --GET
+     
+    http://localhost:8080/user/yearly-caloriesburned-details
