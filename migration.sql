@@ -45,7 +45,7 @@ CREATE TABLE public.exercise_details (
 	CONSTRAINT check_calories_burned CHECK ((calories_burned > 0:::INT8) AND (calories_burned < 20000:::INT8))
 );
 
-
+	
 -- public.meal_details definition
 
 -- Drop table

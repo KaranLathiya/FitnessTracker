@@ -42,7 +42,7 @@ func NewRouter() *chi.Mux {
 				r.Put("/", handlers.UpdateUserProfileDetails)
 				r.Get("/", handlers.FetchUserProfileDetails)
 			})
-		
+
 			r.Route("/exercise", func(r chi.Router) {
 				r.Post("/", handlers.AddExerciseDetails)
 				// r.Get("/", handlers.FetchExerciseDetails)

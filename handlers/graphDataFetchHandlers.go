@@ -11,9 +11,10 @@ import (
 
 func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	db = dal.GetDB()
-	var yearlyWeight[] models.YearlyWeight
-	year := r.FormValue("year")
-	rows, err := db.Query("select date_part('month', date) ,avg(daily_weight) FROM public.weight_details where user_id=$1 and date_part('year', date)=$2 GROUP BY date_part('month', date);" ,UserID.UserID, year)
+	var yearlyWeight []models.YearlyWeight
+	date := r.FormValue("date")
+	year := date[:4]
+	rows, err := db.Query("select date_part('month', date) ,avg(daily_weight) FROM public.weight_details where user_id=$1 and date_part('year', date)=$2 GROUP BY date_part('month', date);", UserID.UserID, year)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)
 		return
@@ -22,7 +23,7 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		emptyYearlyWeight := models.YearlyWeight{}
 		yearlyWeight = append(yearlyWeight, emptyYearlyWeight)
-		err := rows.Scan(&yearlyWeight[i].Month,&yearlyWeight[i].AverageMonthlyWeight)
+		err := rows.Scan(&yearlyWeight[i].Month, &yearlyWeight[i].AverageMonthlyWeight)
 		if err != nil {
 			fmt.Println("Error scanning row:", err)
 			return
@@ -37,9 +38,10 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 
 func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	db = dal.GetDB()
-	var yearlyCaloriesBurned[] models.YearlyCaloriesBurned
-	year := r.FormValue("year")
-	rows, err := db.Query("select date_part('month', date) ,avg(calories_burned) FROM public.exercise_details where user_id=$1 and date_part('year', date)=$2 GROUP BY date_part('month', date);" ,UserID.UserID, year)
+	var yearlyCaloriesBurned []models.YearlyCaloriesBurned
+	date := r.FormValue("date")
+	year := date[:4]
+	rows, err := db.Query("select date_part('month', date) ,avg(calories_burned) FROM public.exercise_details where user_id=$1 and date_part('year', date)=$2 GROUP BY date_part('month', date);", UserID.UserID, year)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)
 		return
@@ -48,7 +50,7 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		emptyYearlyCaloriesBurned := models.YearlyCaloriesBurned{}
 		yearlyCaloriesBurned = append(yearlyCaloriesBurned, emptyYearlyCaloriesBurned)
-		err := rows.Scan(&yearlyCaloriesBurned[i].Month,&yearlyCaloriesBurned[i].AverageMonthlyCaloriesBurned)
+		err := rows.Scan(&yearlyCaloriesBurned[i].Month, &yearlyCaloriesBurned[i].AverageMonthlyCaloriesBurned)
 		if err != nil {
 			fmt.Println("Error scanning row:", err)
 			return

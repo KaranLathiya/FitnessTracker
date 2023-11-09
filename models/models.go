@@ -52,11 +52,11 @@ type Date struct {
 }
 
 type YearlyWeight struct {
-	Month string `json:"month"  validate:"required"`
+	Month                int     `json:"month"  validate:"required"`
 	AverageMonthlyWeight float32 `json:"averageMonthlyWeight" validate:"required"`
 }
 
 type YearlyCaloriesBurned struct {
-	Month string `json:"month"  validate:"required"`
+	Month                        int     `json:"month"  validate:"required"`
 	AverageMonthlyCaloriesBurned float32 `json:"averageMonthlyCaloriesBurned" validate:"required"`
 }

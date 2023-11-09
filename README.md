@@ -7,6 +7,15 @@ exercises, meals, weight, and set of personal health goals.
 Created using Go + cockroachdb.
 
 
+## Deployment
+
+Project also running on 
+
+```bash
+  https://fitnesstracker-k5h0.onrender.com
+```
+
+
 ## Run Locally
 
 Clone the project
@@ -26,6 +35,7 @@ Install dependencies
 ```bash
   go mod tidy 
 ```
+Set variables in .env file
 
 Start the server
 

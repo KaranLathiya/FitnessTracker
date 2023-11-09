@@ -26,7 +26,7 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	defer rows.Close()
-	
+
 	user_data, _ := json.MarshalIndent(user, "", "  ")
 	w.Write(user_data)
 }
@@ -152,4 +152,3 @@ func fetchWaterDetails(date string) (interface{}, error) {
 	_, _ = json.MarshalIndent(water, "", "  ")
 	return water, err
 }
-

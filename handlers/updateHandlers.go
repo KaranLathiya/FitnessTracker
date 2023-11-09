@@ -12,15 +12,15 @@ import (
 func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	var user models.Users
 	var RowsAffected int64
-		_, err = dataReadFromBody(r, &user)
-		if err != nil {
-			errors.MessageShow(400, err.Error(), w)
-			return
-		}
-		RowsAffected, err = dal.MustExec("UPDATE public.user_details set  age=$2, gender=$3, height=$4, weight=$5, health_goal=$6, profile_photo=$7  where user_id=$1 ;", UserID.UserID, user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
-	
+	_, err = dataReadFromBody(r, &user)
 	if err != nil {
-		databaseErrorMessage,databaseErrorCode := errors.DatabaseErrorShow(err)
+		errors.MessageShow(400, err.Error(), w)
+		return
+	}
+	RowsAffected, err = dal.MustExec("UPDATE public.user_details set  age=$2, gender=$3, height=$4, weight=$5, health_goal=$6, profile_photo=$7  where user_id=$1 ;", UserID.UserID, user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
+
+	if err != nil {
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
@@ -40,11 +40,11 @@ func UpdateMealDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var RowsAffected int64
-	
-		RowsAffected, err = dal.MustExec("UPDATE public.meal_details set ingredients=$1, calories_consumed=$2  where user_id=$3 AND date=$4 AND meal_type=$5;", meal.Ingeredients, meal.CaloriesConsumed, UserID.UserID, time.Now().Format("2006-01-02"), meal.MealType)
-	
+
+	RowsAffected, err = dal.MustExec("UPDATE public.meal_details set ingredients=$1, calories_consumed=$2  where user_id=$3 AND date=$4 AND meal_type=$5;", meal.Ingeredients, meal.CaloriesConsumed, UserID.UserID, time.Now().Format("2006-01-02"), meal.MealType)
+
 	if err != nil {
-		databaseErrorMessage,databaseErrorCode := errors.DatabaseErrorShow(err)
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
@@ -64,10 +64,10 @@ func UpdateExerciseDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var RowsAffected int64
-		RowsAffected, err = dal.MustExec("UPDATE public.exercise_details set duration=$1, calories_burned=$2  where user_id=$3 AND date=$4 AND exercise_type=$5;", exercise.Duration, exercise.CaloriesBurned, UserID.UserID, time.Now().Format("2006-01-02"), exercise.ExerciseType)
-	
+	RowsAffected, err = dal.MustExec("UPDATE public.exercise_details set duration=$1, calories_burned=$2  where user_id=$3 AND date=$4 AND exercise_type=$5;", exercise.Duration, exercise.CaloriesBurned, UserID.UserID, time.Now().Format("2006-01-02"), exercise.ExerciseType)
+
 	if err != nil {
-		databaseErrorMessage,databaseErrorCode := errors.DatabaseErrorShow(err)
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
@@ -88,9 +88,9 @@ func UpdateWeightDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	var RowsAffected int64
 	RowsAffected, err = dal.MustExec("UPDATE public.weight_details set daily_weight=$2  where user_id=$2 AND date=$3 ;", weight.DailyWeight, UserID.UserID, time.Now().Format("2006-01-02"))
-	
+
 	if err != nil {
-		databaseErrorMessage,databaseErrorCode := errors.DatabaseErrorShow(err)
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
@@ -110,10 +110,10 @@ func UpdateWaterDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var RowsAffected int64
-		RowsAffected, err = dal.MustExec("UPDATE public.water_details set water_intake=$2  where user_id=$2 AND date=$3 ;", water.WaterIntake, UserID.UserID, time.Now().Format("2006-01-02"))
-	
+	RowsAffected, err = dal.MustExec("UPDATE public.water_details set water_intake=$2  where user_id=$2 AND date=$3 ;", water.WaterIntake, UserID.UserID, time.Now().Format("2006-01-02"))
+
 	if err != nil {
-		databaseErrorMessage,databaseErrorCode := errors.DatabaseErrorShow(err)
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
