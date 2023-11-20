@@ -14,8 +14,27 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	var yearlyWeight []models.YearlyWeight
 	date := r.FormValue("date")
 	year := date[:4]
-	rows, err := db.Query("select date_part('month', date) ,avg(daily_weight) FROM public.weight_details where user_id=$1 and date_part('year', date)=$2 GROUP BY date_part('month', date);", UserID.UserID, year)
+	fmt.Println(year)
+	rows, err := db.Query(`
+	WITH RECURSIVE month_series AS (
+		SELECT
+		  DATE '`+year+`-01-01' + i * INTERVAL '1 month' AS month
+		FROM
+		  generate_series(0, 11, 1) AS i
+	    )
+	    SELECT
+		  EXTRACT(MONTH FROM month) AS month,
+		  COALESCE(avg(daily_weight),0)
+	    FROM
+		  month_series
+	    LEFT JOIN
+		  public.weight_details  ON DATE_TRUNC('month', month) = DATE_TRUNC('month', public.weight_details.date) and user_id = $1
+	    GROUP BY
+		  month
+	    ORDER BY
+		  month;`, UserID.UserID)
 	if err != nil {
+
 		errors.MessageShow(500, "Internal Server Error", w)
 		return
 	}
@@ -28,10 +47,10 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Error scanning row:", err)
 			return
 		}
-		i += 1
-	}
-	defer rows.Close()
 
+		i += 1
+		defer rows.Close()
+	}
 	yearlyWeightDeatils, _ := json.MarshalIndent(yearlyWeight, "", "  ")
 	w.Write(yearlyWeightDeatils)
 }
@@ -41,7 +60,24 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	var yearlyCaloriesBurned []models.YearlyCaloriesBurned
 	date := r.FormValue("date")
 	year := date[:4]
-	rows, err := db.Query("select date_part('month', date) ,avg(calories_burned) FROM public.exercise_details where user_id=$1 and date_part('year', date)=$2 GROUP BY date_part('month', date);", UserID.UserID, year)
+	rows, err := db.Query(`
+	WITH RECURSIVE month_series AS (
+		SELECT
+		  DATE '`+year+`-01-01' + i * INTERVAL '1 month' AS month
+		FROM
+		  generate_series(0, 11, 1) AS i
+	    )
+	    SELECT
+		  EXTRACT(MONTH FROM month) AS month,
+		  COALESCE(avg(calories_burned),0)
+	    FROM
+		  month_series
+	    LEFT JOIN
+		  public.exercise_details  ON DATE_TRUNC('month', month) = DATE_TRUNC('month', public.exercise_details.date) and user_id = $1
+	    GROUP BY
+		  month
+	    ORDER BY
+		  month;`, UserID.UserID)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)
 		return
