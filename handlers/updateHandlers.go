@@ -87,7 +87,7 @@ func UpdateWeightDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var RowsAffected int64
-	RowsAffected, err = dal.MustExec("UPDATE public.weight_details set daily_weight=$2  where user_id=$2 AND date=$3 ;", weight.DailyWeight, UserID.UserID, time.Now().Format("2006-01-02"))
+	RowsAffected, err = dal.MustExec("UPDATE public.weight_details set daily_weight=$1  where user_id=$2 AND date=$3 ;", weight.DailyWeight, UserID.UserID, time.Now().Format("2006-01-02"))
 
 	if err != nil {
 		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
