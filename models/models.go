@@ -29,7 +29,7 @@ type Meal struct {
 }
 
 type Weight struct {
-	DailyWeight string `json:"dailyWeight" validate:"required,gte=2,lte=700" `
+	DailyWeight int `json:"dailyWeight" validate:"required,gte=2,lte=700" `
 	Date        string `json:"date,omitempty"`
 }
 
