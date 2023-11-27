@@ -12,15 +12,16 @@ import (
 func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	db = dal.GetDB()
 	var user models.Users
-	rows, err := db.Query("select age, gender, height, weight, health_goal, profile_photo from public.user_details where user_id=$1", UserID.UserID)
+	rows, err := db.Query("select email, fullname, age, gender, height, weight, health_goal, profile_photo from public.user_details where user_id=$1", UserID.UserID)
 	// errIfZeroRows := db.QueryRow("select email, fullname from public.user_registration_details where user_id=$1", UserID.UserID).Scan(&user.Email, &user.FullName)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)
 		return
 	}
 	for rows.Next() {
-		err := rows.Scan(&user.Age, &user.Gender, &user.Height, &user.Weight, &user.HealthGoal, &user.ProfilePhoto)
+		err := rows.Scan(&user.Email, &user.FullName, &user.Age, &user.Gender, &user.Height, &user.Weight, &user.HealthGoal, &user.ProfilePhoto)
 		if err != nil {
+			fmt.Println(err)
 			w.Write([]byte("null"))
 			return
 		}

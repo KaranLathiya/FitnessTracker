@@ -17,7 +17,7 @@ func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 		errors.MessageShow(400, err.Error(), w)
 		return
 	}
-	RowsAffected, err = dal.MustExec("UPDATE public.user_details set  age=$2, gender=$3, height=$4, weight=$5, health_goal=$6, profile_photo=$7  where user_id=$1 ;", UserID.UserID, user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
+	RowsAffected, err = dal.MustExec("UPDATE public.user_details set  email=$2, fullname=$3, age=$4, gender=$5, height=$6, weight=$7, health_goal=$8, profile_photo=$9  where user_id=$1 ;", UserID.UserID, user.Email, user.FullName, user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
 
 	if err != nil {
 		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)

@@ -9,14 +9,8 @@ import (
 	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
 	"strings"
-
-	// "log"
 	"net/http"
-
 	"github.com/go-playground/validator"
-
-	// "github.com/gorilla/securecookie"
-	// "github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,6 +36,7 @@ var ok bool
 //		}
 //		return key, nil
 //	}
+
 func Authentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -160,8 +155,8 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 func UserLogin(w http.ResponseWriter, r *http.Request) {
 
 	var userID models.UserID
-	var userLogin models.UserSignup
-	var user models.UserSignup
+	var userLogin models.UserLogin
+	var user models.UserLogin
 	db = dal.GetDB()
 	fmt.Println("start")
 	_, err = dataReadFromBody(r, &user)
@@ -196,22 +191,22 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+// func Logout(w http.ResponseWriter, r *http.Request) {
 
-	// session, err := store.Get(r, "val")
-	// session.Options.MaxAge = -1
-	// if err != nil {
-	// 	fmt.Println("Error no session Found !")
-	// 	errors.MessageShow(200, "Successfull logout", w)
-	// 	return
-	// }
-	// fmt.Println(session.Values)
-	// session.Values["authenticated"] = false
+// session, err := store.Get(r, "val")
+// session.Options.MaxAge = -1
+// if err != nil {
+// 	fmt.Println("Error no session Found !")
+// 	errors.MessageShow(200, "Successfull logout", w)
+// 	return
+// }
+// fmt.Println(session.Values)
+// session.Values["authenticated"] = false
 
-	// err = session.Save(r, w)
-	// if err != nil {
-	// 	errors.MessageShow(500, "Internal server error", w)
-	// 	return
-	// }
-	errors.MessageShow(200, "Successfull logout", w)
-}
+// err = session.Save(r, w)
+// if err != nil {
+// 	errors.MessageShow(500, "Internal server error", w)
+// 	return
+// }
+// 	errors.MessageShow(200, "Successfull logout", w)
+// }

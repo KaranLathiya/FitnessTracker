@@ -11,7 +11,6 @@ import (
 func DeleteMealDetails(w http.ResponseWriter, r *http.Request) {
 
 	mealType := r.FormValue("mealtype")
-	//fmt.Fprintf(w, " %s\n", mealType)
 	var RowsAffected int64
 	RowsAffected, err = dal.MustExec("DELETE FROM public.meal_details where user_id=$1 AND date=$2 AND meal_type=$3;", UserID.UserID, time.Now().Format("2006-01-02"), mealType)
 
@@ -31,8 +30,6 @@ func DeleteMealDetails(w http.ResponseWriter, r *http.Request) {
 func DeleteExerciseDetails(w http.ResponseWriter, r *http.Request) {
 
 	ExerciseType := r.FormValue("exercisetype")
-	//fmt.Fprintf(w, " %s\n", ExerciseType)
-
 	var RowsAffected int64
 	RowsAffected, err = dal.MustExec("DELETE FROM public.exercise_details where user_id=$1 AND date=$2 AND exercise_type=$3;", UserID.UserID, time.Now().Format("2006-01-02"), ExerciseType)
 
