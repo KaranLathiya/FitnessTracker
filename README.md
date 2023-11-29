@@ -112,12 +112,12 @@ To delete water details of user --DELETE
 To fetch monthly water details of user --GET
      
     http://localhost:8080/user/alldetails
-
+<!-- 
 ## For WaterIntake Monthly 
 
 To fetch monthly water details of user --GET
      
-    http://localhost:8080/user/water-intake-of-month
+    http://localhost:8080/user/water-intake-of-month -->
 
 ## For Weight Details Yearly 
 

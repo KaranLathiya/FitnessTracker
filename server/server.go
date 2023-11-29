@@ -27,7 +27,7 @@ func main() {
 	fmt.Println("Server started")
 	db, err := dal.Connect()
 	errors.CheckErr(err)
-	dal.InitDB(db)
+	// dal.InitDB(db)
 
 	//Routing
 	r := routes.NewRouter()

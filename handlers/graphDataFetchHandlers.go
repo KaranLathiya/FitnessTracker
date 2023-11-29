@@ -68,16 +68,23 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 		  generate_series(0, 11, 1) AS i
 	    )
 	    SELECT
-		  EXTRACT(MONTH FROM month) AS month,
-		  COALESCE(avg(calories_burned),0)
+	    	  month,
+		  COALESCE(avg(calories_burned),0) as average_calories_burned_monthly
 	    FROM
-		  month_series
-	    LEFT JOIN
-		  public.exercise_details  ON DATE_TRUNC('month', month) = DATE_TRUNC('month', public.exercise_details.date) and user_id = $1
+		(SELECT
+			EXTRACT(MONTH FROM month) AS month,
+			COALESCE(sum(calories_burned),0) AS calories_burned
+			,date
+		FROM
+			month_series
+		LEFT JOIN
+			public.exercise_details  ON DATE_TRUNC('month', month) = DATE_TRUNC('month', public.exercise_details.date) and user_id = $1
+		GROUP BY
+			month,date  
+		ORDER BY
+			month)
 	    GROUP BY
-		  month
-	    ORDER BY
-		  month;`, UserID.UserID)
+		month;`, UserID.UserID)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)
 		return
@@ -98,27 +105,28 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	yearlyCaloriesBurnedDeatils, _ := json.MarshalIndent(yearlyCaloriesBurned, "", "  ")
 	w.Write(yearlyCaloriesBurnedDeatils)
 }
-func FetchWaterIntakeMonthly(w http.ResponseWriter, r *http.Request) {
-	db = dal.GetDB()
-	rows, err := db.Query("select water_intake, date  from public.water_details where user_id=$1 AND date >= NOW() - INTERVAL '30 days' order by date desc", UserID.UserID)
-	if err != nil {
-		errors.MessageShow(500, "Internal Server Error", w)
-		return
-	}
-	var water []models.Water
-	i := 0
-	for rows.Next() {
-		emptyWater := models.Water{}
-		water = append(water, emptyWater)
-		err := rows.Scan(&water[i].WaterIntake, &water[i].Date)
-		if err != nil {
-			fmt.Println("Error scanning row:", err)
-			return
-		}
-		i += 1
-	}
-	defer rows.Close()
 
-	dailyWaterDetails, _ := json.MarshalIndent(water, "", "  ")
-	w.Write(dailyWaterDetails)
-}
+// func FetchWaterIntakeMonthly(w http.ResponseWriter, r *http.Request) {
+// 	db = dal.GetDB()
+// 	rows, err := db.Query("select water_intake, date  from public.water_details where user_id=$1 AND date >= NOW() - INTERVAL '30 days' order by date desc", UserID.UserID)
+// 	if err != nil {
+// 		errors.MessageShow(500, "Internal Server Error", w)
+// 		return
+// 	}
+// 	var water []models.Water
+// 	i := 0
+// 	for rows.Next() {
+// 		emptyWater := models.Water{}
+// 		water = append(water, emptyWater)
+// 		err := rows.Scan(&water[i].WaterIntake, &water[i].Date)
+// 		if err != nil {
+// 			fmt.Println("Error scanning row:", err)
+// 			return
+// 		}
+// 		i += 1
+// 	}
+// 	defer rows.Close()
+
+// 	dailyWaterDetails, _ := json.MarshalIndent(water, "", "  ")
+// 	w.Write(dailyWaterDetails)
+// }

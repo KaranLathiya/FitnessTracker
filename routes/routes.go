@@ -69,7 +69,7 @@ func NewRouter() *chi.Mux {
 			})
 			r.Get("/yearly-weight-details", handlers.FetchYearlyWeightDetails)
 			r.Get("/yearly-caloriesburned-details", handlers.FetchYearlyCaloriesBurnedDetails)
-			r.Get("/water-intake-of-month", handlers.FetchWaterIntakeMonthly)
+			// r.Get("/water-intake-of-month", handlers.FetchWaterIntakeMonthly)
 			r.Get("/alldetails", handlers.FetchAllDetails)
 		})
 

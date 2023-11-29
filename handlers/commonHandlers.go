@@ -141,7 +141,7 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 	}
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(userSignup.Password), 14)
 	userSignup.Password = string(bytes)
-	fmt.Println(userSignup)
+	// fmt.Println(userSignup)
 	// fmt.Print(db)
 
 	err = db.QueryRow("INSERT INTO public.user_details( email, fullname, password) VALUES ( $1, $2, $3) returning user_id ;", userSignup.Email, userSignup.FullName, userSignup.Password).Scan(&userID.UserID)
@@ -158,14 +158,14 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	var userLogin models.UserLogin
 	var user models.UserLogin
 	db = dal.GetDB()
-	fmt.Println("start")
+	// fmt.Println("start")
 	_, err = dataReadFromBody(r, &user)
 	if err != nil {
 		errors.MessageShow(400, err.Error(), w)
 		return
 	}
 
-	fmt.Println(user)
+	// fmt.Println(user)
 
 	errIfNoRows := db.QueryRow("select user_id, email , password from public.user_details where email=$1", user.Email).Scan(&userID.UserID, &userLogin.Email, &userLogin.Password)
 	if errIfNoRows == nil {
