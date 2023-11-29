@@ -124,7 +124,7 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 		fmt.Println("Error in passing data through json")
 		return bodyData, err
 	}
-	fmt.Println(bodyData)
+	// fmt.Println(bodyData)
 	return bodyData, err
 }
 
@@ -146,7 +146,8 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 
 	err = db.QueryRow("INSERT INTO public.user_details( email, fullname, password) VALUES ( $1, $2, $3) returning user_id ;", userSignup.Email, userSignup.FullName, userSignup.Password).Scan(&userID.UserID)
 	if err != nil {
-		errors.MessageShow(409, err.Error(), w)
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
 	userID_data, _ := json.MarshalIndent(userID, "", "  ")
