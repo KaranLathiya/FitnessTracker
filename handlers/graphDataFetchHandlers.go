@@ -84,6 +84,8 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 		ORDER BY
 			month)
 	    GROUP BY
+		month
+	    ORDER BY
 		month;`, UserID.UserID)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)

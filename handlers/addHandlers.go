@@ -15,7 +15,7 @@ func AddUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	db = dal.GetDB()
 
 	_, err = dataReadFromBody(r, &user)
-	if err != nil {
+	if err != nil {	
 		errors.MessageShow(400, err.Error(), w)
 		return
 	}
