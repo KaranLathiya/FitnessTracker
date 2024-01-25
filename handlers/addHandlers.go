@@ -12,10 +12,9 @@ import (
 func AddUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 
 	var user models.Users
-	db = dal.GetDB()
 
 	_, err = dataReadFromBody(r, &user)
-	if err != nil {	
+	if err != nil {
 		errors.MessageShow(400, err.Error(), w)
 		return
 	}
@@ -32,7 +31,7 @@ func AddUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 func AddExerciseDetails(w http.ResponseWriter, r *http.Request) {
 
 	var exercise models.Exercise
-	db = dal.GetDB()
+
 	_, err = dataReadFromBody(r, &exercise)
 	if err != nil {
 		errors.MessageShow(400, err.Error(), w)
@@ -53,7 +52,7 @@ func AddExerciseDetails(w http.ResponseWriter, r *http.Request) {
 func AddMealDetails(w http.ResponseWriter, r *http.Request) {
 
 	var meal models.Meal
-	db = dal.GetDB()
+
 	_, err = dataReadFromBody(r, &meal)
 
 	if err != nil {
@@ -73,7 +72,7 @@ func AddMealDetails(w http.ResponseWriter, r *http.Request) {
 func AddWeightDetails(w http.ResponseWriter, r *http.Request) {
 
 	var weight models.Weight
-	db = dal.GetDB()
+
 	_, err = dataReadFromBody(r, &weight)
 	if err != nil {
 		errors.MessageShow(400, err.Error(), w)
@@ -92,7 +91,7 @@ func AddWeightDetails(w http.ResponseWriter, r *http.Request) {
 func AddWaterDetails(w http.ResponseWriter, r *http.Request) {
 
 	var water models.Water
-	db = dal.GetDB()
+
 	_, err = dataReadFromBody(r, &water)
 	if err != nil {
 		errors.MessageShow(400, err.Error(), w)

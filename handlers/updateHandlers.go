@@ -130,6 +130,7 @@ func UpdateWaterDetails(w http.ResponseWriter, r *http.Request) {
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	var password models.ChangePassword
 	var RowsAffected int64
+	db := dal.GetDB()
 	_, err = dataReadFromBody(r, &password)
 	if err != nil {
 		errors.MessageShow(400, err.Error(), w)

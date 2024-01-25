@@ -10,7 +10,7 @@ import (
 )
 
 func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 	var user models.Users
 	rows, err := db.Query("select email, fullname, age, gender, height, weight, health_goal, profile_photo from public.user_details where user_id=$1", UserID.UserID)
 	// errIfZeroRows := db.QueryRow("select email, fullname from public.user_registration_details where user_id=$1", UserID.UserID).Scan(&user.Email, &user.FullName)
@@ -34,7 +34,6 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 
 func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 	allDetailsMap := make(map[string]interface{})
-	db = dal.GetDB()
 	date := r.FormValue("date")
 	//fmt.Println(date)
 	exercise, err := fetchExerciseDetails(date)
@@ -62,7 +61,7 @@ func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func fetchExerciseDetails(date string) (interface{}, error) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 
 	var exercise []models.Exercise
 	rows, err := db.Query("select exercise_type, duration, calories_burned from public.exercise_details where user_id=$1 AND date=$2", UserID.UserID, date)
@@ -84,7 +83,7 @@ func fetchExerciseDetails(date string) (interface{}, error) {
 	return exercise, err
 }
 func fetchMealDetails(date string) (interface{}, error) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 	var meal []models.Meal
 	rows, err := db.Query("select meal_type, ingredients, calories_consumed from public.meal_details where user_id=$1 and date=$2", UserID.UserID, date)
 	if err != nil {
@@ -105,7 +104,7 @@ func fetchMealDetails(date string) (interface{}, error) {
 	return meal, err
 }
 func fetchWeightDetails(date string) (interface{}, error) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 	var weight models.Weight
 	rows, err := db.Query("select daily_weight from public.weight_details where user_id=$1 AND date=$2 ", UserID.UserID, date)
 	if err != nil {
@@ -130,7 +129,7 @@ func fetchWeightDetails(date string) (interface{}, error) {
 }
 
 func fetchWaterDetails(date string) (interface{}, error) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 	var water models.Water
 	rows, err := db.Query("select water_intake from public.water_details where user_id=$1 AND date=$2", UserID.UserID, date)
 	if err != nil {

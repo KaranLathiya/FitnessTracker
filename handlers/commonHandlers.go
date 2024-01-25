@@ -1,20 +1,20 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
 	"karanlathiya/FitnessTracker/dal"
 	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
-	"strings"
 	"net/http"
+	"strings"
+
 	"github.com/go-playground/validator"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var db *sql.DB
+// var db *sql.DB
 var err error
 var UserID models.UserID
 var validate = validator.New()
@@ -45,7 +45,7 @@ func Authentication(next http.Handler) http.Handler {
 			errors.MessageShow(498, "Invalid token", w)
 			return
 		}
-		db = dal.GetDB()
+		db := dal.GetDB()
 		rows, err := db.Query("select user_id from public.user_details where user_id=$1", UserID.UserID)
 		if err != nil {
 			errors.MessageShow(500, "Internal Server Error", w)
@@ -132,7 +132,7 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 
 	var userSignup models.UserSignup
 	var userID models.UserID
-	db = dal.GetDB()
+	db := dal.GetDB()
 
 	_, err = dataReadFromBody(r, &userSignup)
 	if err != nil {
@@ -158,7 +158,7 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	var userID models.UserID
 	var userLogin models.UserLogin
 	var user models.UserLogin
-	db = dal.GetDB()
+	db := dal.GetDB()
 	// fmt.Println("start")
 	_, err = dataReadFromBody(r, &user)
 	if err != nil {

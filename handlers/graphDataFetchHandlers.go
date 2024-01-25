@@ -10,7 +10,7 @@ import (
 )
 
 func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 	var yearlyWeight []models.YearlyWeight
 	date := r.FormValue("date")
 	year := date[:4]
@@ -56,7 +56,7 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
-	db = dal.GetDB()
+	db := dal.GetDB()
 	var yearlyCaloriesBurned []models.YearlyCaloriesBurned
 	date := r.FormValue("date")
 	year := date[:4]
@@ -109,7 +109,7 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 // func FetchWaterIntakeMonthly(w http.ResponseWriter, r *http.Request) {
-// 	db = dal.GetDB()
+// 	db := dal.GetDB()
 // 	rows, err := db.Query("select water_intake, date  from public.water_details where user_id=$1 AND date >= NOW() - INTERVAL '30 days' order by date desc", UserID.UserID)
 // 	if err != nil {
 // 		errors.MessageShow(500, "Internal Server Error", w)

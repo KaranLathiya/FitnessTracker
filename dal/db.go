@@ -46,7 +46,7 @@ func Connect() (*sql.DB, error) {
 // }
 
 func MustExec(query string, args ...interface{}) (int64, error) {
-	db = GetDB()
+	db := GetDB()
 	result, err := db.Exec(query, args...)
 	if err != nil {
 		return 0, err
