@@ -38,6 +38,9 @@ func NewRouter() *chi.Mux {
 
 		r.Route("/user", func(r chi.Router) {
 			r.Use(handlers.Authentication)
+
+			r.Put("/change-password", handlers.UpdateUserPassword)
+
 			r.Route("/profile", func(r chi.Router) {
 				r.Put("/", handlers.UpdateUserProfileDetails)
 				r.Get("/", handlers.FetchUserProfileDetails)

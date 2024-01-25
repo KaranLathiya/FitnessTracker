@@ -7,6 +7,8 @@ import (
 	"karanlathiya/FitnessTracker/models"
 	"net/http"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
@@ -123,4 +125,45 @@ func UpdateWaterDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(RowsAffected)
 	errors.MessageShow(200, "User details Successfully updated", w)
+}
+
+func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+	var password models.ChangePassword
+	var RowsAffected int64
+	_, err = dataReadFromBody(r, &password)
+	if err != nil {
+		errors.MessageShow(400, err.Error(), w)
+		return
+	}
+	if password.CurrentPassword == password.NewPassword {
+		errors.MessageShow(400, "current password and new password can't be same", w)
+		return 
+	}
+	var currentHashedpassword string 
+	errIfNoRows := db.QueryRow("select password from public.user_details where user_id=$1", UserID.UserID).Scan(&currentHashedpassword)
+	if errIfNoRows != nil {
+		fmt.Println("error")
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		return
+	}
+	err := bcrypt.CompareHashAndPassword([]byte(currentHashedpassword), []byte(password.CurrentPassword))
+	if err != nil {
+		errors.MessageShow(401, "Wrong password", w)
+		return
+	}
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(password.NewPassword), 14)
+	password.NewPassword = string(bytes)
+	RowsAffected, err = dal.MustExec("UPDATE public.user_details set password=$1 where user_id=$2;", password.NewPassword, UserID.UserID)
+	if err != nil {
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		return
+	}
+	if RowsAffected == 0 {
+		errors.MessageShow(400, "Invalid data", w)
+		return
+	}
+	fmt.Println(RowsAffected)
+	errors.MessageShow(200, "User password successfully updated", w)
 }

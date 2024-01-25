@@ -54,7 +54,10 @@ type Message struct {
 type UserID struct {
 	UserID string `json:"userId"  validate:"required" `
 }
-
+type ChangePassword struct {
+	CurrentPassword string `json:"CurrentPassword"  validate:"required" `
+	NewPassword string `json:"newPassword"  validate:"required" `
+}
 type Date struct {
 	Date string `json:"date"  validate:"required"`
 }
