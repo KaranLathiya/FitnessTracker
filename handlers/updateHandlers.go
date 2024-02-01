@@ -138,9 +138,9 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	if password.CurrentPassword == password.NewPassword {
 		errors.MessageShow(400, "current password and new password can't be same", w)
-		return 
+		return
 	}
-	var currentHashedpassword string 
+	var currentHashedpassword string
 	errIfNoRows := db.QueryRow("select password from public.user_details where user_id=$1", UserID.UserID).Scan(&currentHashedpassword)
 	if errIfNoRows != nil {
 		fmt.Println("error")

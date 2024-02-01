@@ -82,3 +82,9 @@ type YearlyCaloriesBurned struct {
 	Month                        int     `json:"month"  validate:"required"`
 	AverageMonthlyCaloriesBurned float32 `json:"averageMonthlyCaloriesBurned" validate:"required"`
 }
+type SetNewPaswordInput struct {
+	Email       string `json:"email" validate:"required,email" `
+	EventType   string `json:"eventType" validate:"required" `
+	Token       string `json:"token"  validate:"required"`
+	NewPassword string `json:"newPassword"  validate:"required"`
+}

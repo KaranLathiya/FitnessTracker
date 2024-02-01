@@ -22,29 +22,10 @@ import (
 )
 
 const otpChars = "1234567890"
-
-// var db *sql.DB
 var err error
 var UserID models.UserID
 var validate = validator.New()
 var ok bool
-
-// var (
-// 	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-// 	aes256Key, _ = generateAESKey(32)
-// 	// aes256Key = []byte("super-secret-key")
-// 	store    = sessions.NewCookieStore(aes256Key)
-//
-// )
-
-//	func generateAESKey(keyLength int) ([]byte, error) {
-//		key := make([]byte, keyLength)
-//		_, err := rand.Read(key)
-//		if err != nil {
-//			return nil, err
-//		}
-//		return key, nil
-//	}
 
 func Authentication(next http.Handler) http.Handler {
 
@@ -215,7 +196,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	var email string
 	errIfNoRows := db.QueryRow("select email from public.user_details where email=$1", forgotPasswordInput.Email).Scan(&email)
 	if errIfNoRows == nil {
-		otp, err := GenerateOTP(6)
+		otp, err := generateOTP(6)
 		if err != nil {
 			errors.MessageShow(400, err.Error(), w)
 			return
@@ -243,7 +224,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 	var validateOTP models.ValidateOTP
 	db := dal.GetDB()
-	currentFormattedTime := CurrentTimeConvertToCurrentFormattedTime()
+	currentFormattedTime := currentTimeConvertToCurrentFormattedTime()
 	_, err = dataReadFromBody(r, &validateOTP)
 	if err != nil {
 		errors.MessageShow(400, err.Error(), w)
@@ -255,6 +236,7 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		storedOTP := models.ValidateOTP{}
 		err := rows.Scan(&storedOTP.OTP)
@@ -277,7 +259,40 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	errors.MessageShow(401, "Invalid OTP", w)
-	defer rows.Close()
+}
+
+func SetNewPassword(w http.ResponseWriter, r *http.Request) {
+	var setNewPaswordInput models.SetNewPaswordInput
+	db := dal.GetDB()
+	_, err = dataReadFromBody(r, &setNewPaswordInput)
+	if err != nil {
+		errors.MessageShow(400, err.Error(), w)
+		return
+	}
+	var hashedToken string
+	errIfNoRows := db.QueryRow("select token from public.token_details where email=$1 and event_type=$2", setNewPaswordInput.Email, setNewPaswordInput.EventType).Scan(&hashedToken)
+	if errIfNoRows != nil {
+		errors.MessageShow(400, "Invalid email or eventType", w)
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(hashedToken), []byte(setNewPaswordInput.Token))
+	if err == nil {
+		bytes, _ := bcrypt.GenerateFromPassword([]byte(setNewPaswordInput.NewPassword), 14)
+		hashedNewPassword := string(bytes)
+		RowsAffected, err := dal.MustExec("UPDATE public.user_details set password=$1 where email=$2;", hashedNewPassword, setNewPaswordInput.Email)
+		if err != nil {
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			return
+		}
+		if RowsAffected == 0 {
+			errors.MessageShow(400, "Invalid data", w)
+			return
+		}
+		errors.MessageShow(200, "Password successfully changed", w)
+		return
+	}
+	errors.MessageShow(401, "Invalid token", w)
 }
 
 func postOTPVerificationProcess(email string, eventType string) (string, error) {
@@ -331,7 +346,7 @@ func sendMail(email string, otp string) error {
 	return nil
 }
 
-func CurrentTimeConvertToCurrentFormattedTime() string {
+func currentTimeConvertToCurrentFormattedTime() string {
 	currentTime := time.Now().UTC().Add(time.Minute)
 	outputFormat := "2006-01-02 15:04:05-07:00"
 	currentFormattedTime := currentTime.Format(outputFormat)
@@ -350,7 +365,7 @@ func storeOTP(email string, otp string, eventType string) error {
 	return nil
 }
 
-func GenerateOTP(length int) (string, error) {
+func generateOTP(length int) (string, error) {
 	buffer := make([]byte, length)
 	_, err := rand.Read(buffer)
 	if err != nil {

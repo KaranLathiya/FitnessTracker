@@ -28,6 +28,7 @@ func MessageShow(code int, message string, w http.ResponseWriter) {
 	Message.Code = code
 	Message.Message = message
 	user_data, _ := json.MarshalIndent(Message, "", "  ")
+	
 	w.WriteHeader(code)
 	w.Write(user_data)
 }
