@@ -1,8 +1,8 @@
 package models
 
 type Users struct {
-	Email        string `json:"email" validate:"required,email" `
-	FullName     string `json:"fullName" validate:"required" `
+	Email        string  `json:"email" validate:"required,email" `
+	FullName     string  `json:"fullName" validate:"required" `
 	Age          *int    `json:"age" validate:"required,gt=0,lte=130" `
 	Gender       *string `json:"gender" validate:"required" `
 	Height       *int    `json:"height" validate:"required,gte=50,lte=300" `
@@ -56,17 +56,28 @@ type UserID struct {
 }
 type ChangePassword struct {
 	CurrentPassword string `json:"CurrentPassword"  validate:"required" `
-	NewPassword string `json:"newPassword"  validate:"required" `
+	NewPassword     string `json:"newPassword"  validate:"required" `
 }
 type Date struct {
 	Date string `json:"date"  validate:"required"`
 }
+type ForgotPasswordInput struct {
+	Email     string `json:"email" validate:"required,email" `
+	EventType string `json:"eventType" validate:"required" `
+}
 
+type ValidateOTP struct {
+	Email     string `json:"email" validate:"required,email" `
+	EventType string `json:"eventType" validate:"required" `
+	OTP       string `json:"otp" validate:"required" `
+}
 type YearlyWeight struct {
 	Month                int     `json:"month"  validate:"required"`
 	AverageMonthlyWeight float32 `json:"averageMonthlyWeight" validate:"required"`
 }
-
+type Token struct {
+	Token string `json:"token"  validate:"required"`
+}
 type YearlyCaloriesBurned struct {
 	Month                        int     `json:"month"  validate:"required"`
 	AverageMonthlyCaloriesBurned float32 `json:"averageMonthlyCaloriesBurned" validate:"required"`

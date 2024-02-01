@@ -82,6 +82,7 @@ func fetchExerciseDetails(date string) (interface{}, error) {
 	_, _ = json.MarshalIndent(exercise, "", "  ")
 	return exercise, err
 }
+
 func fetchMealDetails(date string) (interface{}, error) {
 	db := dal.GetDB()
 	var meal []models.Meal

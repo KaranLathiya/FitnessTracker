@@ -1,18 +1,27 @@
 package handlers
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
 	"karanlathiya/FitnessTracker/dal"
 	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
+	"log"
 	"net/http"
+	"net/smtp"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/go-playground/validator"
+	"github.com/joho/godotenv"
+	"github.com/markbates/going/randx"
 	"golang.org/x/crypto/bcrypt"
 )
+
+const otpChars = "1234567890"
 
 // var db *sql.DB
 var err error
@@ -153,6 +162,7 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 	userID_data, _ := json.MarshalIndent(userID, "", "  ")
 	w.Write(userID_data)
 }
+
 func UserLogin(w http.ResponseWriter, r *http.Request) {
 
 	var userID models.UserID
@@ -190,6 +200,168 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	errors.MessageShow(404, "Email id doesn't exist", w)
 
+}
+
+func ForgotPassword(w http.ResponseWriter, r *http.Request) {
+
+	var forgotPasswordInput models.ForgotPasswordInput
+	db := dal.GetDB()
+	// fmt.Println("start")
+	_, err = dataReadFromBody(r, &forgotPasswordInput)
+	if err != nil {
+		errors.MessageShow(400, err.Error(), w)
+		return
+	}
+	var email string
+	errIfNoRows := db.QueryRow("select email from public.user_details where email=$1", forgotPasswordInput.Email).Scan(&email)
+	if errIfNoRows == nil {
+		otp, err := GenerateOTP(6)
+		if err != nil {
+			errors.MessageShow(400, err.Error(), w)
+			return
+		}
+		fmt.Println(otp)
+		err = sendMail(email, otp)
+		if err != nil {
+			errors.MessageShow(400, err.Error(), w)
+			return
+		}
+		bytes, _ := bcrypt.GenerateFromPassword([]byte(otp), 14)
+		hashedOTP := string(bytes)
+		err = storeOTP(email, hashedOTP, forgotPasswordInput.EventType)
+		if err != nil {
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			return
+		}
+		errors.MessageShow(200, "OTP sent to email Successfully", w)
+		return
+	}
+	errors.MessageShow(404, "Email id doesn't exist", w)
+}
+
+func VerifyOTP(w http.ResponseWriter, r *http.Request) {
+	var validateOTP models.ValidateOTP
+	db := dal.GetDB()
+	currentFormattedTime := CurrentTimeConvertToCurrentFormattedTime()
+	_, err = dataReadFromBody(r, &validateOTP)
+	if err != nil {
+		errors.MessageShow(400, err.Error(), w)
+		return
+	}
+	rows, err := db.Query("select otp from public.otp_details where email=$1 and event_type=$2 and expires_at >= $3 ", validateOTP.Email, validateOTP.EventType, currentFormattedTime)
+	if err != nil {
+		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		return
+	}
+	for rows.Next() {
+		storedOTP := models.ValidateOTP{}
+		err := rows.Scan(&storedOTP.OTP)
+		if err != nil {
+			errors.MessageShow(400, err.Error(), w)
+			return
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(storedOTP.OTP), []byte(validateOTP.OTP))
+		if err == nil {
+			var token models.Token
+			token.Token, err = postOTPVerificationProcess(validateOTP.Email, validateOTP.EventType)
+			if err != nil {
+				databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+				errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+				return
+			}
+			tokenData, _ := json.MarshalIndent(token, "", "  ")
+			w.Write(tokenData)
+			return
+		}
+	}
+	errors.MessageShow(401, "Invalid OTP", w)
+	defer rows.Close()
+}
+
+func postOTPVerificationProcess(email string, eventType string) (string, error) {
+	db := dal.GetDB()
+	tx, err := db.Begin()
+	if err != nil {
+		return "", err
+	}
+	defer tx.Rollback()
+	_, err = tx.Exec("DELETE FROM public.otp_details WHERE email=$1 AND event_type=$2;", email, eventType)
+	if err != nil {
+		return "", err
+	}
+	token := randx.String(8)
+	tokenBytes, _ := bcrypt.GenerateFromPassword([]byte(token), 14)
+	hashedToken := string(tokenBytes)
+	_, err = tx.Exec("UPSERT INTO public.token_details( email, token, event_type) VALUES ( $1, $2, $3)", email, hashedToken, eventType)
+	if err != nil {
+		return "", err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func sendMail(email string, otp string) error {
+	from := "fitnesstrackerdaily@gmail.com"
+	to := email
+
+	msg := "From: " + from + "\n" +
+		"To: " + to + "\n" +
+		"Subject: OTP for new password\n\n" +
+		otp
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Some error occured. Err: %s", err)
+		return err
+	}
+	emailPass := os.Getenv("EMAILPASSWORD")
+	err = smtp.SendMail("smtp.gmail.com:587",
+		smtp.PlainAuth("", from, emailPass, "smtp.gmail.com"),
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		log.Printf("smtp error: %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func CurrentTimeConvertToCurrentFormattedTime() string {
+	currentTime := time.Now().UTC().Add(time.Minute)
+	outputFormat := "2006-01-02 15:04:05-07:00"
+	currentFormattedTime := currentTime.Format(outputFormat)
+	return currentFormattedTime
+}
+
+func storeOTP(email string, otp string, eventType string) error {
+	db := dal.GetDB()
+	otpExpiryTime := time.Now().UTC().Add(time.Minute * time.Duration(5))
+	outputFormat := "2006-01-02 15:04:05-07:00"
+	otpExpiryFormattedTime := otpExpiryTime.Format(outputFormat)
+	_, err := db.Exec("INSERT INTO public.otp_details( email, otp, event_type, expires_at) VALUES ( $1, $2, $3, $4) ;", email, otp, eventType, otpExpiryFormattedTime)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GenerateOTP(length int) (string, error) {
+	buffer := make([]byte, length)
+	_, err := rand.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	otpCharsLength := len(otpChars)
+	for i := 0; i < length; i++ {
+		buffer[i] = otpChars[int(buffer[i])%otpCharsLength]
+	}
+	return string(buffer), nil
 }
 
 // func Logout(w http.ResponseWriter, r *http.Request) {

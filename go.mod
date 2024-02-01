@@ -18,5 +18,6 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
+	github.com/markbates/going v1.0.3
 	golang.org/x/crypto v0.17.0
 )

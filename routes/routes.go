@@ -35,7 +35,9 @@ func NewRouter() *chi.Mux {
 		r.Use(handlers.HandleCORS)
 		r.Post("/signup", handlers.UserSignup)
 		r.Post("/login", handlers.UserLogin)
-
+		r.Post("/forgot-password", handlers.ForgotPassword)
+		r.Post("/verify-otp", handlers.VerifyOTP)
+		
 		r.Route("/user", func(r chi.Router) {
 			r.Use(handlers.Authentication)
 
