@@ -22,6 +22,7 @@ import (
 )
 
 const otpChars = "1234567890"
+
 var err error
 var UserID models.UserID
 var validate = validator.New()
@@ -84,22 +85,6 @@ func HandleCORS(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-// func validSession(r *http.Request) (*sessions.Session, error) {
-// 	session, err := store.Get(r, "val")
-// 	fmt.Println(session)
-// 	if err != nil {
-// 		fmt.Println("Error no session Found !", err)
-// 		session.Options.MaxAge = -1
-// 		return session, err
-// 	}
-// 	if session.Values["authenticated"] != true {
-// 		err = errors.New("need to login First")
-// 		fmt.Println("First login")
-// 		return session, err
-// 	}
-// 	return session, err
-// }
 
 func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error) {
 	body, err := io.ReadAll(r.Body)
@@ -279,14 +264,29 @@ func SetNewPassword(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		bytes, _ := bcrypt.GenerateFromPassword([]byte(setNewPaswordInput.NewPassword), 14)
 		hashedNewPassword := string(bytes)
-		RowsAffected, err := dal.MustExec("UPDATE public.user_details set password=$1 where email=$2;", hashedNewPassword, setNewPaswordInput.Email)
+		tx, err := db.Begin()
 		if err != nil {
 			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
-		if RowsAffected == 0 {
-			errors.MessageShow(400, "Invalid data", w)
+		defer tx.Rollback()
+		_, err = tx.Exec("UPDATE public.user_details set password=$1 where email=$2;", hashedNewPassword, setNewPaswordInput.Email)
+		if err != nil {
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			return
+		}
+		_, err = tx.Exec("DELETE FROM public.token_details WHERE email=$1 AND event_type=$2;", setNewPaswordInput.Email, setNewPaswordInput.EventType)
+		if err != nil {
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			return
+		}
+		err = tx.Commit()
+		if err != nil {
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		errors.MessageShow(200, "Password successfully changed", w)
@@ -397,4 +397,20 @@ func generateOTP(length int) (string, error) {
 // 	return
 // }
 // 	errors.MessageShow(200, "Successfull logout", w)
+// }
+
+// func validSession(r *http.Request) (*sessions.Session, error) {
+// 	session, err := store.Get(r, "val")
+// 	fmt.Println(session)
+// 	if err != nil {
+// 		fmt.Println("Error no session Found !", err)
+// 		session.Options.MaxAge = -1
+// 		return session, err
+// 	}
+// 	if session.Values["authenticated"] != true {
+// 		err = errors.New("need to login First")
+// 		fmt.Println("First login")
+// 		return session, err
+// 	}
+// 	return session, err
 // }

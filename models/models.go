@@ -1,14 +1,14 @@
 package models
 
 type Users struct {
-	Email        string  `json:"email" validate:"required,email" `
-	FullName     string  `json:"fullName" validate:"required" `
-	Age          *int    `json:"age" validate:"required,gt=0,lte=130" `
-	Gender       *string `json:"gender" validate:"required" `
-	Height       *int    `json:"height" validate:"required,gte=50,lte=300" `
-	Weight       *int    `json:"weight" validate:"required,gte=2,lte=700" `
-	HealthGoal   *string `json:"healthGoal" validate:"required" `
-	ProfilePhoto *string `json:"profilePhoto" validate:"required" `
+	Email        string   `json:"email" validate:"required,email" `
+	FullName     string   `json:"fullName" validate:"required" `
+	Age          *int     `json:"age" validate:"required,gt=0,lte=130" `
+	Gender       *string  `json:"gender" validate:"required" `
+	Height       *float32 `json:"height" validate:"required,gte=50,lte=300" `
+	Weight       *float32 `json:"weight" validate:"required,gte=2,lte=700" `
+	HealthGoal   *string  `json:"healthGoal" validate:"required" `
+	ProfilePhoto *string  `json:"profilePhoto" validate:"required" `
 }
 
 type UserSignup struct {
@@ -23,27 +23,27 @@ type UserLogin struct {
 }
 
 type Exercise struct {
-	ExerciseType   string `json:"exerciseType" validate:"required" `
-	Duration       int    `json:"duration" validate:"required,gt=0,lte=1440"`
-	CaloriesBurned int    `json:"caloriesBurned" validate:"required,gt=0,lte=20000"`
-	Date           string `json:"date,omitempty"`
+	ExerciseType   string  `json:"exerciseType" validate:"required" `
+	Duration       int     `json:"duration" validate:"required,gt=0,lte=1440"`
+	CaloriesBurned float32 `json:"caloriesBurned" validate:"required,gt=0,lte=20000"`
+	Date           string  `json:"date,omitempty"`
 }
 
 type Meal struct {
-	MealType         string `json:"mealType" validate:"required" `
-	Ingeredients     string `json:"ingredients" validate:"required" `
-	CaloriesConsumed int    `json:"caloriesConsumed" validate:"required,gte=0,lte=20000" `
-	Date             string `json:"date,omitempty"`
+	MealType         string  `json:"mealType" validate:"required" `
+	Ingeredients     string  `json:"ingredients" validate:"required" `
+	CaloriesConsumed float32 `json:"caloriesConsumed" validate:"required,gte=0,lte=20000" `
+	Date             string  `json:"date,omitempty"`
 }
 
 type Weight struct {
-	DailyWeight int    `json:"dailyWeight" validate:"required,gte=2,lte=700" `
-	Date        string `json:"date,omitempty"`
+	DailyWeight float32 `json:"dailyWeight" validate:"required,gte=2,lte=700" `
+	Date        string  `json:"date,omitempty"`
 }
 
 type Water struct {
-	WaterIntake int    `json:"waterIntake" validate:"required,gt=0,lte=20" `
-	Date        string `json:"date,omitempty"`
+	WaterIntake float32 `json:"waterIntake" validate:"required,gt=0,lte=20" `
+	Date        string  `json:"date,omitempty"`
 }
 
 type Message struct {
