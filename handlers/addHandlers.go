@@ -17,7 +17,7 @@ func AddUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 		errors.MessageShow(400, err.Error(), w)
 		return
 	}
-	_, err := dal.MustExec("UPDATE public.user_details set age=$2, gender=$3, height=$4, weight=$5, health_goal=$6, profile_photo=$7  where user_id=$1 ;", UserID.UserID, user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
+	_, err := dal.MustExec("UPDATE public.user_details SET age=$2, gender=$3, height=$4, weight=$5, health_goal=$6, profile_photo=$7  WHERE user_id=$1 ;", UserID.UserID, user.Age, user.Gender, user.Height, user.Weight, user.HealthGoal, user.ProfilePhoto)
 	if err != nil {
 		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
 		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
@@ -65,6 +65,7 @@ func AddMealDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	errors.MessageShow(200, "User details Successfully added", w)
 }
+
 func AddWeightDetails(w http.ResponseWriter, r *http.Request) {
 
 	var weight models.Weight
@@ -83,6 +84,7 @@ func AddWeightDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	errors.MessageShow(200, "User details Successfully added", w)
 }
+
 func AddWaterDetails(w http.ResponseWriter, r *http.Request) {
 
 	var water models.Water

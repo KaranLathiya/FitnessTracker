@@ -2,7 +2,6 @@ package errors
 
 import (
 	"encoding/json"
-	"fmt"
 	"karanlathiya/FitnessTracker/models"
 	"net/http"
 
@@ -28,7 +27,6 @@ func MessageShow(code int, message string, w http.ResponseWriter) {
 	Message.Code = code
 	Message.Message = message
 	user_data, _ := json.MarshalIndent(Message, "", "  ")
-	
 	w.WriteHeader(code)
 	w.Write(user_data)
 }
@@ -38,12 +36,12 @@ func DatabaseErrorShow(err error) (string, int) {
 		// Access PostgreSQL-specific error fields
 		// errCode,_ :=  strconv.Atoi(dbErr.Code)
 		errCode := dbErr.Code
-		errMessage := errCode.Name()
-		errDetail := dbErr.Detail
+		// errMessage := errCode.Name()
+		// errDetail := dbErr.Detail
 		// Handle the PostgreSQL-specific error
-		fmt.Println(errCode)
-		fmt.Println(errDetail)
-		fmt.Println(errMessage)
+		// fmt.Println(errCode)
+		// fmt.Println(errDetail)
+		// fmt.Println(errMessage)
 		switch errCode {
 		case "23502":
 			// not-null constraint violation
@@ -63,7 +61,7 @@ func DatabaseErrorShow(err error) (string, int) {
 
 		}
 	}
-	return err.Error(), 401
+	return err.Error(), 500
 }
 
 // var (

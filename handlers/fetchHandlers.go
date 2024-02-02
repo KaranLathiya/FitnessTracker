@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"karanlathiya/FitnessTracker/dal"
 	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
@@ -12,7 +11,7 @@ import (
 func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	var user models.Users
-	rows, err := db.Query("select email, fullname, age, gender, height, weight, health_goal, profile_photo from public.user_details where user_id=$1", UserID.UserID)
+	rows, err := db.Query("SELECT email, fullname, age, gender, height, weight, health_goal, profile_photo FROM public.user_details WHERE user_id=$1", UserID.UserID)
 	// errIfZeroRows := db.QueryRow("select email, fullname from public.user_registration_details where user_id=$1", UserID.UserID).Scan(&user.Email, &user.FullName)
 	if err != nil {
 		errors.MessageShow(500, "Internal Server Error", w)
@@ -21,8 +20,8 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err := rows.Scan(&user.Email, &user.FullName, &user.Age, &user.Gender, &user.Height, &user.Weight, &user.HealthGoal, &user.ProfilePhoto)
 		if err != nil {
-			fmt.Println(err)
-			w.Write([]byte("null"))
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 	}
@@ -64,7 +63,7 @@ func fetchExerciseDetails(date string) (interface{}, error) {
 	db := dal.GetDB()
 
 	var exercise []models.Exercise
-	rows, err := db.Query("select exercise_type, duration, calories_burned from public.exercise_details where user_id=$1 AND date=$2", UserID.UserID, date)
+	rows, err := db.Query("SELECT exercise_type, duration, calories_burned FROM public.exercise_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
 	if err != nil {
 		return exercise, err
 	}
@@ -86,7 +85,7 @@ func fetchExerciseDetails(date string) (interface{}, error) {
 func fetchMealDetails(date string) (interface{}, error) {
 	db := dal.GetDB()
 	var meal []models.Meal
-	rows, err := db.Query("select meal_type, ingredients, calories_consumed from public.meal_details where user_id=$1 and date=$2", UserID.UserID, date)
+	rows, err := db.Query("SELECT meal_type, ingredients, calories_consumed FROM public.meal_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
 	if err != nil {
 		return meal, err
 	}
@@ -107,7 +106,7 @@ func fetchMealDetails(date string) (interface{}, error) {
 func fetchWeightDetails(date string) (interface{}, error) {
 	db := dal.GetDB()
 	var weight models.Weight
-	rows, err := db.Query("select daily_weight from public.weight_details where user_id=$1 AND date=$2 ", UserID.UserID, date)
+	rows, err := db.Query("SELECT daily_weight FROM public.weight_details WHERE user_id=$1 AND date=$2 ", UserID.UserID, date)
 	if err != nil {
 		return weight, err
 	}
@@ -132,7 +131,7 @@ func fetchWeightDetails(date string) (interface{}, error) {
 func fetchWaterDetails(date string) (interface{}, error) {
 	db := dal.GetDB()
 	var water models.Water
-	rows, err := db.Query("select water_intake from public.water_details where user_id=$1 AND date=$2", UserID.UserID, date)
+	rows, err := db.Query("SELECT water_intake FROM public.water_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
 	if err != nil {
 		return water, err
 	}
@@ -141,7 +140,7 @@ func fetchWaterDetails(date string) (interface{}, error) {
 	for rows.Next() {
 		err := rows.Scan(&water.WaterIntake)
 		if err != nil {
-			fmt.Println("Error scanning row:", err)
+			// fmt.Println("Error scanning row:", err)
 			return water, err
 		}
 		i += 1

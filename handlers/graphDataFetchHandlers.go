@@ -44,7 +44,8 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 		yearlyWeight = append(yearlyWeight, emptyYearlyWeight)
 		err := rows.Scan(&yearlyWeight[i].Month, &yearlyWeight[i].AverageMonthlyWeight)
 		if err != nil {
-			fmt.Println("Error scanning row:", err)
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 
@@ -97,7 +98,8 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 		yearlyCaloriesBurned = append(yearlyCaloriesBurned, emptyYearlyCaloriesBurned)
 		err := rows.Scan(&yearlyCaloriesBurned[i].Month, &yearlyCaloriesBurned[i].AverageMonthlyCaloriesBurned)
 		if err != nil {
-			fmt.Println("Error scanning row:", err)
+			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
+			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		i += 1

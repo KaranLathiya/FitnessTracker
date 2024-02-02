@@ -4,10 +4,10 @@ type Users struct {
 	Email        string   `json:"email" validate:"required,email" `
 	FullName     string   `json:"fullName" validate:"required" `
 	Age          *int     `json:"age" validate:"required,gt=0,lte=130" `
-	Gender       *string  `json:"gender" validate:"required" `
+	Gender       *string  `json:"gender" validate:"required,oneof=male female other" `
 	Height       *float32 `json:"height" validate:"required,gte=50,lte=300" `
 	Weight       *float32 `json:"weight" validate:"required,gte=2,lte=700" `
-	HealthGoal   *string  `json:"healthGoal" validate:"required" `
+	HealthGoal   *string  `json:"healthGoal" validate:"required,oneof=weight_loss weight_gain muscle_building maintain_body" `
 	ProfilePhoto *string  `json:"profilePhoto" validate:"required" `
 }
 
@@ -23,14 +23,14 @@ type UserLogin struct {
 }
 
 type Exercise struct {
-	ExerciseType   string  `json:"exerciseType" validate:"required" `
+	ExerciseType   string  `json:"exerciseType" validate:"required,oneof=weight_lifting walking running gym yoga" `
 	Duration       int     `json:"duration" validate:"required,gt=0,lte=1440"`
 	CaloriesBurned float32 `json:"caloriesBurned" validate:"required,gt=0,lte=20000"`
 	Date           string  `json:"date,omitempty"`
 }
 
 type Meal struct {
-	MealType         string  `json:"mealType" validate:"required" `
+	MealType         string  `json:"mealType" validate:"required,oneof=breakfast lunch snacks dinner" `
 	Ingeredients     string  `json:"ingredients" validate:"required" `
 	CaloriesConsumed float32 `json:"caloriesConsumed" validate:"required,gte=0,lte=20000" `
 	Date             string  `json:"date,omitempty"`
@@ -61,12 +61,12 @@ type ChangePassword struct {
 type Date struct {
 	Date string `json:"date"  validate:"required"`
 }
-type ForgotPasswordInput struct {
+type RequestOTP struct {
 	Email     string `json:"email" validate:"required,email" `
-	EventType string `json:"eventType" validate:"required" `
+	EventType string `json:"eventType" validate:"required,oneof=forgot_password" `
 }
 
-type ValidateOTP struct {
+type VerifyOTP struct {
 	Email     string `json:"email" validate:"required,email" `
 	EventType string `json:"eventType" validate:"required" `
 	OTP       string `json:"otp" validate:"required" `
@@ -84,7 +84,7 @@ type YearlyCaloriesBurned struct {
 }
 type SetNewPaswordInput struct {
 	Email       string `json:"email" validate:"required,email" `
-	EventType   string `json:"eventType" validate:"required" `
+	EventType   string `json:"eventType" validate:"required,oneof=forgot_password" `
 	Token       string `json:"token"  validate:"required"`
 	NewPassword string `json:"newPassword"  validate:"required"`
 }
