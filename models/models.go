@@ -8,7 +8,7 @@ type Users struct {
 	Height       *float32 `json:"height" validate:"required,gte=50,lte=300" `
 	Weight       *float32 `json:"weight" validate:"required,gte=2,lte=700" `
 	HealthGoal   *string  `json:"healthGoal" validate:"required,oneof=weight_loss weight_gain muscle_building maintain_body" `
-	ProfilePhoto *string  `json:"profilePhoto" validate:"required" `
+	ProfilePhoto *string  `json:"profilePhoto"  `
 }
 
 type UserSignup struct {
@@ -36,6 +36,12 @@ type Meal struct {
 	Date             string  `json:"date,omitempty"`
 }
 
+type MealType struct {
+	MealType string `json:"mealType" validate:"required,oneof=breakfast lunch snacks dinner" `
+}
+type ExerciseType struct {
+	ExerciseType   string  `json:"exerciseType" validate:"required,oneof=weight_lifting walking running gym yoga" `
+}
 type Weight struct {
 	DailyWeight float32 `json:"dailyWeight" validate:"required,gte=2,lte=700" `
 	Date        string  `json:"date,omitempty"`

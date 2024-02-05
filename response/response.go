@@ -2,6 +2,7 @@ package response
 
 import (
 	"encoding/json"
+	"fmt"
 	"karanlathiya/FitnessTracker/models"
 	"net/http"
 
@@ -60,7 +61,8 @@ func DatabaseErrorShow(err error) (string, int) {
 
 		}
 	}
-	return err.Error(), 500
+	fmt.Println(err.Error())
+	return "Internal server error", 500
 }
 
 // var (

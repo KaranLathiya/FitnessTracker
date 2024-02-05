@@ -37,26 +37,17 @@ func Authentication(next http.Handler) http.Handler {
 			return
 		}
 		db := dal.GetDB()
-		rows, err := db.Query("SELECT user_id FROM public.user_details WHERE user_id=$1", UserID.UserID)
-		if err != nil {
+		errIfNoRows := db.QueryRow("SELECT user_id FROM public.user_details WHERE user_id=$1", UserID.UserID).Scan(&UserID.UserID)
+		if errIfNoRows != nil {
+			if errIfNoRows.Error() == "sql: no rows in result set" {
+				response.MessageShow(498, "Invalid token", w)
+				return
+			}
 			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
 			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
-		i := 0
-		for rows.Next() {
-			// err := rows.Scan(&UserID.UserID)
-			// if err != nil {
-			// 	fmt.Println("Error scanning row:", err)
-			// 	return
-			// }
-			i += 1
-		}
-		defer rows.Close()
-		if i == 0 {
-			response.MessageShow(498, "Invalid token", w)
-			return
-		}
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -96,8 +87,8 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 	json.Unmarshal(body, &bodyData)
 	err = validate.Struct(bodyData)
 	if err != nil {
-		fmt.Println("Error in passing data through json")
-		return bodyData, err
+		fmt.Println(err)
+		return nil, fmt.Errorf("invalid data")
 	}
 	// fmt.Println(bodyData)
 	return bodyData, err
@@ -114,8 +105,12 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 	}
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(userSignup.Password), 14)
 	userSignup.Password = string(bytes)
-	err = db.QueryRow("INSERT INTO public.user_details( email, fullname, password) VALUES ( $1, $2, $3) RETURNING user_id ;", userSignup.Email, userSignup.FullName, userSignup.Password).Scan(&userID.UserID)
-	if err != nil {
+	errIfNoRows := db.QueryRow("INSERT INTO public.user_details( email, fullname, password) VALUES ( $1, $2, $3) RETURNING user_id ;", userSignup.Email, userSignup.FullName, userSignup.Password).Scan(&userID.UserID)
+	if errIfNoRows != nil {
+		if errIfNoRows.Error() == "sql: no rows in result set" {
+			response.MessageShow(401, "Email id doesn't exist", w)
+			return
+		}
 		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
 		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return

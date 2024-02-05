@@ -6,6 +6,7 @@ import (
 	"karanlathiya/FitnessTracker/models"
 	"karanlathiya/FitnessTracker/response"
 	"net/http"
+	"time"
 )
 
 func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
@@ -33,21 +34,31 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 	allDetailsMap := make(map[string]interface{})
 	date := r.FormValue("date")
+	dateLayout := "2006-01-02"
+	_, err := time.Parse(dateLayout, date)
+	if err != nil {
+		response.MessageShow(400, "Invalid data", w)
+		return
+	}
 	exercise, err := fetchExerciseDetails(date)
 	if err != nil {
-		response.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, "Internal server error", w)
+		return
 	}
 	meal, err := fetchMealDetails(date)
 	if err != nil {
-		response.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, "Internal server error", w)
+		return
 	}
 	weight, err := fetchWeightDetails(date)
 	if err != nil {
-		response.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, "Internal server error", w)
+		return
 	}
 	water, err := fetchWaterDetails(date)
 	if err != nil {
-		response.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, "Internal server error", w)
+		return
 	}
 	allDetailsMap["waterDetails"] = water
 	allDetailsMap["weightDetails"] = weight

@@ -30,6 +30,7 @@ func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	response.MessageShow(200, "User details Successfully updated", w)
 }
+
 func UpdateMealDetails(w http.ResponseWriter, r *http.Request) {
 	var meal models.Meal
 	_, err = dataReadFromBody(r, &meal)

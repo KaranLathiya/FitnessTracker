@@ -2,19 +2,22 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"karanlathiya/FitnessTracker/dal"
 	"karanlathiya/FitnessTracker/models"
 	"karanlathiya/FitnessTracker/response"
 	"net/http"
+	"strconv"
 )
 
 func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	var yearlyWeight []models.YearlyWeight
-	date := r.FormValue("date")
-	year := date[:4]
-	fmt.Println(year)
+	year := r.FormValue("year")
+	yearIntValue, err := strconv.Atoi(year)
+	if err != nil || 0 > yearIntValue || 9999 < yearIntValue {
+		response.MessageShow(400, "Invalid data", w)
+		return
+	}
 	rows, err := db.Query(`
 	WITH RECURSIVE month_series AS (
 		SELECT
@@ -57,8 +60,12 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	var yearlyCaloriesBurned []models.YearlyCaloriesBurned
-	date := r.FormValue("date")
-	year := date[:4]
+	year := r.FormValue("year")
+	yearIntValue, err := strconv.Atoi(year)
+	if err != nil || 0 > yearIntValue || 9999 < yearIntValue {
+		response.MessageShow(400, "Invalid data", w)
+		return
+	}
 	rows, err := db.Query(`
 	WITH RECURSIVE month_series AS (
 		SELECT
