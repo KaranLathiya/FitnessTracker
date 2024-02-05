@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 	"karanlathiya/FitnessTracker/dal"
-	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
+	"karanlathiya/FitnessTracker/response"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -33,14 +33,14 @@ func Authentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		UserID.UserID, ok = validation(r)
 		if !ok {
-			errors.MessageShow(498, "Invalid token", w)
+			response.MessageShow(498, "Invalid token", w)
 			return
 		}
 		db := dal.GetDB()
 		rows, err := db.Query("SELECT user_id FROM public.user_details WHERE user_id=$1", UserID.UserID)
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		i := 0
@@ -54,7 +54,7 @@ func Authentication(next http.Handler) http.Handler {
 		}
 		defer rows.Close()
 		if i == 0 {
-			errors.MessageShow(498, "Invalid token", w)
+			response.MessageShow(498, "Invalid token", w)
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -94,7 +94,6 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 	}
 	// fmt.Println(string(body))
 	json.Unmarshal(body, &bodyData)
-
 	err = validate.Struct(bodyData)
 	if err != nil {
 		fmt.Println("Error in passing data through json")
@@ -105,25 +104,20 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 }
 
 func UserSignup(w http.ResponseWriter, r *http.Request) {
-
 	var userSignup models.UserSignup
 	var userID models.UserID
 	db := dal.GetDB()
-
 	_, err = dataReadFromBody(r, &userSignup)
 	if err != nil {
-		errors.MessageShow(400, err.Error(), w)
+		response.MessageShow(400, err.Error(), w)
 		return
 	}
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(userSignup.Password), 14)
 	userSignup.Password = string(bytes)
-	// fmt.Println(userSignup)
-	// fmt.Print(db)
-
 	err = db.QueryRow("INSERT INTO public.user_details( email, fullname, password) VALUES ( $1, $2, $3) RETURNING user_id ;", userSignup.Email, userSignup.FullName, userSignup.Password).Scan(&userID.UserID)
 	if err != nil {
-		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
 	userID_data, _ := json.MarshalIndent(userID, "", "  ")
@@ -131,77 +125,72 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserLogin(w http.ResponseWriter, r *http.Request) {
-
 	var userID models.UserID
 	var userLogin models.UserLogin
 	var user models.UserLogin
 	db := dal.GetDB()
-	// fmt.Println("start")
 	_, err = dataReadFromBody(r, &user)
 	if err != nil {
-		errors.MessageShow(400, err.Error(), w)
+		response.MessageShow(400, err.Error(), w)
 		return
 	}
 	errIfNoRows := db.QueryRow("SELECT user_id, email , password FROM public.user_details WHERE email=$1", user.Email).Scan(&userID.UserID, &userLogin.Email, &userLogin.Password)
-	if errIfNoRows == nil {
-		err := bcrypt.CompareHashAndPassword([]byte(userLogin.Password), []byte(user.Password))
-		if err != nil {
-			errors.MessageShow(401, "Wrong password", w)
+	if errIfNoRows != nil {
+		if errIfNoRows.Error() == "sql: no rows in result set" {
+			response.MessageShow(401, "Email id doesn't exist", w)
 			return
 		}
-		userID_data, _ := json.MarshalIndent(userID, "", "  ")
-		w.Write(userID_data)
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(errIfNoRows)
+		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
-	if errIfNoRows == fmt.Errorf("sql: no rows in result set") {
-		errors.MessageShow(401, "Email id doesn't exist", w)
+	err := bcrypt.CompareHashAndPassword([]byte(userLogin.Password), []byte(user.Password))
+	if err != nil {
+		response.MessageShow(401, "Wrong password", w)
 		return
 	}
-	databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(errIfNoRows)
-	errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+	userID_data, _ := json.MarshalIndent(userID, "", "  ")
+	w.Write(userID_data)
 }
 
 func OTPRequest(w http.ResponseWriter, r *http.Request) {
-
 	var requestOTP models.RequestOTP
 	db := dal.GetDB()
-	// fmt.Println("start")
 	_, err = dataReadFromBody(r, &requestOTP)
 	if err != nil {
-		errors.MessageShow(400, err.Error(), w)
+		response.MessageShow(400, err.Error(), w)
 		return
 	}
 	var email string
 	errIfNoRows := db.QueryRow("SELECT email FROM public.user_details WHERE email=$1", requestOTP.Email).Scan(&email)
-	if errIfNoRows == nil {
-		otp, err := generateOTP(6)
-		if err != nil {
-			errors.MessageShow(400, err.Error(), w)
+	if errIfNoRows != nil {
+		if errIfNoRows.Error() == "sql: no rows in result set" {
+			response.MessageShow(401, "Email id doesn't exist", w)
 			return
 		}
-		// fmt.Println(otp)
-		err = sendMail(email, otp)
-		if err != nil {
-			errors.MessageShow(400, err.Error(), w)
-			return
-		}
-		bytes, _ := bcrypt.GenerateFromPassword([]byte(otp), 14)
-		hashedOTP := string(bytes)
-		err = storeOTP(email, hashedOTP, requestOTP.EventType)
-		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
-			return
-		}
-		errors.MessageShow(200, "OTP sent to email Successfully", w)
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(errIfNoRows)
+		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
-	if errIfNoRows == fmt.Errorf("sql: no rows in result set") {
-		errors.MessageShow(401, "Email id doesn't exist", w)
+	otp, err := generateOTP(6)
+	if err != nil {
+		response.MessageShow(400, err.Error(), w)
 		return
 	}
-	databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(errIfNoRows)
-	errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+	err = sendMail(email, otp)
+	if err != nil {
+		response.MessageShow(400, err.Error(), w)
+		return
+	}
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(otp), 14)
+	hashedOTP := string(bytes)
+	err = storeOTP(email, hashedOTP, requestOTP.EventType)
+	if err != nil {
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		return
+	}
+	response.MessageShow(200, "OTP sent to email Successfully", w)
 }
 
 func VerifyOTP(w http.ResponseWriter, r *http.Request) {
@@ -210,13 +199,13 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 	currentFormattedTime := currentTimeConvertToCurrentFormattedTime()
 	_, err = dataReadFromBody(r, &verifyOTP)
 	if err != nil {
-		errors.MessageShow(400, err.Error(), w)
+		response.MessageShow(400, err.Error(), w)
 		return
 	}
 	rows, err := db.Query("SELECT otp, case WHEN $3>expires_at THEN true ELSE false END AS otp_expired FROM public.otp_details WHERE email=$1 AND event_type=$2", verifyOTP.Email, verifyOTP.EventType, currentFormattedTime)
 	if err != nil {
-		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
 	defer rows.Close()
@@ -225,20 +214,20 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		var expiredOTP bool
 		err := rows.Scan(&storedOTP, &expiredOTP)
 		if err != nil {
-			errors.MessageShow(400, err.Error(), w)
+			response.MessageShow(400, err.Error(), w)
 			return
 		}
 		err = bcrypt.CompareHashAndPassword([]byte(storedOTP), []byte(verifyOTP.OTP))
 		if err == nil {
 			if expiredOTP {
-				errors.MessageShow(410, "OTP Expired", w)
+				response.MessageShow(410, "OTP Expired", w)
 				return
 			}
 			var token models.Token
 			token.Token, err = postOTPVerificationProcess(verifyOTP.Email, verifyOTP.EventType)
 			if err != nil {
-				databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-				errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+				databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+				response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 				return
 			}
 			tokenData, _ := json.MarshalIndent(token, "", "  ")
@@ -246,7 +235,7 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	errors.MessageShow(401, "Invalid OTP", w)
+	response.MessageShow(401, "Invalid OTP", w)
 }
 
 func SetNewPassword(w http.ResponseWriter, r *http.Request) {
@@ -254,18 +243,18 @@ func SetNewPassword(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	_, err = dataReadFromBody(r, &setNewPaswordInput)
 	if err != nil {
-		errors.MessageShow(400, err.Error(), w)
+		response.MessageShow(400, err.Error(), w)
 		return
 	}
 	var hashedToken string
 	errIfNoRows := db.QueryRow("SELECT token FROM public.token_details WHERE email=$1 AND event_type=$2", setNewPaswordInput.Email, setNewPaswordInput.EventType).Scan(&hashedToken)
 	if errIfNoRows != nil {
-		if errIfNoRows == fmt.Errorf("sql: no rows in result set") {
-			errors.MessageShow(400, "Invalid email or eventType or token", w)
+		if errIfNoRows.Error() == "sql: no rows in result set" {
+			response.MessageShow(400, "Invalid email or eventType or token", w)
 			return
 		}
-		databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(errIfNoRows)
-		errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(errIfNoRows)
+		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(hashedToken), []byte(setNewPaswordInput.Token))
@@ -274,33 +263,33 @@ func SetNewPassword(w http.ResponseWriter, r *http.Request) {
 		hashedNewPassword := string(bytes)
 		tx, err := db.Begin()
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		defer tx.Rollback()
 		_, err = tx.Exec("UPDATE public.user_details SET password=$1 WHERE email=$2;", hashedNewPassword, setNewPaswordInput.Email)
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		_, err = tx.Exec("DELETE FROM public.token_details WHERE email=$1 AND event_type=$2;", setNewPaswordInput.Email, setNewPaswordInput.EventType)
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		err = tx.Commit()
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
-		errors.MessageShow(200, "Password successfully changed", w)
+		response.MessageShow(200, "Password successfully changed", w)
 		return
 	}
-	errors.MessageShow(401, "Invalid token", w)
+	response.MessageShow(401, "Invalid token", w)
 }
 
 func postOTPVerificationProcess(email string, eventType string) (string, error) {
@@ -350,7 +339,6 @@ func sendMail(email string, otp string) error {
 		log.Printf("smtp error: %s", err)
 		return err
 	}
-
 	return nil
 }
 
@@ -379,7 +367,6 @@ func generateOTP(length int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	otpCharsLength := len(otpChars)
 	for i := 0; i < length; i++ {
 		buffer[i] = otpChars[int(buffer[i])%otpCharsLength]
@@ -393,7 +380,7 @@ func generateOTP(length int) (string, error) {
 // session.Options.MaxAge = -1
 // if err != nil {
 // 	fmt.Println("Error no session Found !")
-// 	errors.MessageShow(200, "Successfull logout", w)
+// 	response.MessageShow(200, "Successfull logout", w)
 // 	return
 // }
 // fmt.Println(session.Values)
@@ -401,10 +388,10 @@ func generateOTP(length int) (string, error) {
 
 // err = session.Save(r, w)
 // if err != nil {
-// 	errors.MessageShow(500, "Internal server error", w)
+// 	response.MessageShow(500, "Internal server error", w)
 // 	return
 // }
-// 	errors.MessageShow(200, "Successfull logout", w)
+// 	response.MessageShow(200, "Successfull logout", w)
 // }
 
 // func validSession(r *http.Request) (*sessions.Session, error) {

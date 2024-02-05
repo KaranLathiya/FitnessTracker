@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"karanlathiya/FitnessTracker/dal"
-	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
+	"karanlathiya/FitnessTracker/response"
 	"net/http"
 )
 
@@ -14,19 +14,18 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Query("SELECT email, fullname, age, gender, height, weight, health_goal, profile_photo FROM public.user_details WHERE user_id=$1", UserID.UserID)
 	// errIfZeroRows := db.QueryRow("select email, fullname from public.user_registration_details where user_id=$1", UserID.UserID).Scan(&user.Email, &user.FullName)
 	if err != nil {
-		errors.MessageShow(500, "Internal Server Error", w)
+		response.MessageShow(500, "Internal Server Error", w)
 		return
 	}
 	for rows.Next() {
 		err := rows.Scan(&user.Email, &user.FullName, &user.Age, &user.Gender, &user.Height, &user.Weight, &user.HealthGoal, &user.ProfilePhoto)
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 	}
 	defer rows.Close()
-
 	user_data, _ := json.MarshalIndent(user, "", "  ")
 	w.Write(user_data)
 }
@@ -34,22 +33,21 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 	allDetailsMap := make(map[string]interface{})
 	date := r.FormValue("date")
-	//fmt.Println(date)
 	exercise, err := fetchExerciseDetails(date)
 	if err != nil {
-		errors.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, err.Error(), w)
 	}
 	meal, err := fetchMealDetails(date)
 	if err != nil {
-		errors.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, err.Error(), w)
 	}
 	weight, err := fetchWeightDetails(date)
 	if err != nil {
-		errors.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, err.Error(), w)
 	}
 	water, err := fetchWaterDetails(date)
 	if err != nil {
-		errors.MessageShow(500, err.Error(), w)
+		response.MessageShow(500, err.Error(), w)
 	}
 	allDetailsMap["waterDetails"] = water
 	allDetailsMap["weightDetails"] = weight
@@ -61,7 +59,6 @@ func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 
 func fetchExerciseDetails(date string) (interface{}, error) {
 	db := dal.GetDB()
-
 	var exercise []models.Exercise
 	rows, err := db.Query("SELECT exercise_type, duration, calories_burned FROM public.exercise_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
 	if err != nil {
@@ -110,7 +107,6 @@ func fetchWeightDetails(date string) (interface{}, error) {
 	if err != nil {
 		return weight, err
 	}
-
 	i := 0
 	for rows.Next() {
 		err := rows.Scan(&weight.DailyWeight)
@@ -123,7 +119,6 @@ func fetchWeightDetails(date string) (interface{}, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	_, _ = json.MarshalIndent(weight, "", "  ")
 	return weight, err
 }
@@ -135,7 +130,6 @@ func fetchWaterDetails(date string) (interface{}, error) {
 	if err != nil {
 		return water, err
 	}
-
 	i := 0
 	for rows.Next() {
 		err := rows.Scan(&water.WaterIntake)

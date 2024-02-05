@@ -1,4 +1,4 @@
-package errors
+package response
 
 import (
 	"encoding/json"
@@ -8,13 +8,11 @@ import (
 	"github.com/lib/pq"
 )
 
-var Message models.Message
-
-func CheckErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+// func CheckErr(err error) {
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 // func ErrorShow(code int, message string) []byte {
 // 	errMessage.Code = code
@@ -23,10 +21,11 @@ func CheckErr(err error) {
 // 	return user_data
 // }
 
-func MessageShow(code int, message string, w http.ResponseWriter) {
-	Message.Code = code
-	Message.Message = message
-	user_data, _ := json.MarshalIndent(Message, "", "  ")
+func MessageShow(code int, errMessage string, w http.ResponseWriter) {
+	var message models.Message
+	message.Code = code
+	message.Message = errMessage
+	user_data, _ := json.MarshalIndent(message, "", "  ")
 	w.WriteHeader(code)
 	w.Write(user_data)
 }

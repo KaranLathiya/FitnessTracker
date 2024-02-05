@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"karanlathiya/FitnessTracker/dal"
-	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/models"
+	"karanlathiya/FitnessTracker/response"
 	"net/http"
 )
 
@@ -34,8 +34,7 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	    ORDER BY
 		  month;`, UserID.UserID)
 	if err != nil {
-
-		errors.MessageShow(500, "Internal Server Error", w)
+		response.MessageShow(500, "Internal Server Error", w)
 		return
 	}
 	i := 0
@@ -44,11 +43,10 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 		yearlyWeight = append(yearlyWeight, emptyYearlyWeight)
 		err := rows.Scan(&yearlyWeight[i].Month, &yearlyWeight[i].AverageMonthlyWeight)
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
-
 		i += 1
 		defer rows.Close()
 	}
@@ -89,7 +87,7 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	    ORDER BY
 		month;`, UserID.UserID)
 	if err != nil {
-		errors.MessageShow(500, "Internal Server Error", w)
+		response.MessageShow(500, "Internal Server Error", w)
 		return
 	}
 	i := 0
@@ -98,8 +96,8 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 		yearlyCaloriesBurned = append(yearlyCaloriesBurned, emptyYearlyCaloriesBurned)
 		err := rows.Scan(&yearlyCaloriesBurned[i].Month, &yearlyCaloriesBurned[i].AverageMonthlyCaloriesBurned)
 		if err != nil {
-			databaseErrorMessage, databaseErrorCode := errors.DatabaseErrorShow(err)
-			errors.MessageShow(databaseErrorCode, databaseErrorMessage, w)
+			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
 		i += 1
@@ -114,7 +112,7 @@ func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 // 	db := dal.GetDB()
 // 	rows, err := db.Query("select water_intake, date  from public.water_details where user_id=$1 AND date >= NOW() - INTERVAL '30 days' order by date desc", UserID.UserID)
 // 	if err != nil {
-// 		errors.MessageShow(500, "Internal Server Error", w)
+// 		response.MessageShow(500, "Internal Server Error", w)
 // 		return
 // 	}
 // 	var water []models.Water

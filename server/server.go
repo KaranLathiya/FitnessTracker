@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"karanlathiya/FitnessTracker/dal"
-	"karanlathiya/FitnessTracker/errors"
 	"karanlathiya/FitnessTracker/routes"
 	"log"
 	"net/http"
@@ -26,7 +25,9 @@ func main() {
 	}
 	fmt.Println("Server started")
 	db, err := dal.Connect()
-	errors.CheckErr(err)
+	if err != nil {
+		panic(err)
+	}
 	// dal.InitDB(db)
 
 	//Routing
