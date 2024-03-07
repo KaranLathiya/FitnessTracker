@@ -10,6 +10,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// UpdateUserProfileDetails example
+//
+// @tags UserProfile
+// @Security UserIDAuth
+//	@Summary		update user profile details 
+//	@Description	update user profile details like Email, FullName, Age, Gender, Height, Weight, HealthGoal, ProfilePhoto
+//	@ID				user-profile-update
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.Users true "The input for update the user profile details"
+//	@Success		200				string		"User details Successfully updated"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/profile/ [put]
 func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	var user models.Users
 	var RowsAffected int64
@@ -31,6 +47,22 @@ func UpdateUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(200, "User details Successfully updated", w)
 }
 
+// UpdateMealDetails example
+//
+// @tags Meal
+// @Security UserIDAuth
+//	@Summary		update meal details of today
+//	@Description	update meal details like Ingredients, MealType, CaloriesConsumed
+//	@ID				user-meal-update
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.Meal true "The input for update the meal details"
+//	@Success		200				string		"User details Successfully updated"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/meal/ [put]
 func UpdateMealDetails(w http.ResponseWriter, r *http.Request) {
 	var meal models.Meal
 	_, err = dataReadFromBody(r, &meal)
@@ -52,6 +84,22 @@ func UpdateMealDetails(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(200, "User details Successfully updated", w)
 }
 
+// UpdateExerciseDetails example
+//
+// @tags Exercise
+// @Security UserIDAuth
+//	@Summary		update exercise details of today
+//	@Description	update exercise details like Duration, ExerciseType, CaloriesBurned
+//	@ID				user-exercise-update
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.Exercise true "The input for update the exercise details"
+//	@Success		200				string		"User details Successfully updated"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/exercise/ [put]
 func UpdateExerciseDetails(w http.ResponseWriter, r *http.Request) {
 	var exercise models.Exercise
 	_, err = dataReadFromBody(r, &exercise)
@@ -73,6 +121,22 @@ func UpdateExerciseDetails(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(200, "User details Successfully updated", w)
 }
 
+// UpdateWeightDetails example
+//
+// @tags Weight
+// @Security UserIDAuth
+//	@Summary		update weight details of today
+//	@Description	update daily weight details 
+//	@ID				user-weight
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.Weight true "The input for update the weight details"
+//	@Success		200				string		"User details Successfully updated"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/weight/ [put]
 func UpdateWeightDetails(w http.ResponseWriter, r *http.Request) {
 	var weight models.Weight
 	_, err = dataReadFromBody(r, &weight)
@@ -94,6 +158,22 @@ func UpdateWeightDetails(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(200, "User details Successfully updated", w)
 }
 
+// UpdateWaterDetails example
+//
+// @tags Water
+// @Security UserIDAuth
+//	@Summary		update water details of today
+//	@Description	update daily water details 
+//	@ID				user-water-update
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.Water true "The input for update the water details"
+//	@Success		200				string		"User details Successfully updated"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/water/ [put]
 func UpdateWaterDetails(w http.ResponseWriter, r *http.Request) {
 	var water models.Water
 	_, err = dataReadFromBody(r, &water)

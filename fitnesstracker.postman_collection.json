@@ -1,0 +1,651 @@
+{
+	"info": {
+		"_postman_id": "9dd0595a-313a-4545-b1d7-209545e1ffdb",
+		"name": "fitnesstracker",
+		"description": "fitness tracker application to track your daily records",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30678853"
+	},
+	"item": [
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"2810karanlathiya@gmail.com\",\r\n    \"password\":\"Karan@123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/login",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"2810karanlathiya@gmail.com\",\r\n    \"password\":\"Karan@123\",\r\n    \"fullname\":\"karan\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/signup",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user profile update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"2810karanlathiya@gmail.com\",\r\n    \"fullname\":\"karan\",\r\n    \"age\": 22,\r\n    \"gender\": \"male\",\r\n    \"height\": 80,\r\n    \"weight\": 67,\r\n    \"healthGoal\": \"weight_gain\",\r\n    \"profilePhoto\": \"optional\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/profile/",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"profile",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user profile show",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/profile/",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"profile",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "meal add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"mealType\":\"lunch\",\r\n    \"ingredients\":\"apple\",\r\n    \"caloriesConsumed\":45\r\n}   ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/meal",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"meal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "meal update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"mealType\":\"lunch\",\r\n    \"ingredients\":\"apple\",\r\n    \"caloriesConsumed\":455\r\n}   ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/meal",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"meal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "meal delete",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"mealType\":\"Lunch\"\r\n}   ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/meal?mealtype=lunch",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"meal"
+					],
+					"query": [
+						{
+							"key": "mealtype",
+							"value": "lunch"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all details show",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user//alldetails?date=2023-06-02",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"",
+						"alldetails"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2023-06-02"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "exercise add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"exerciseType\":\"running\",\r\n    \"caloriesBurned\":55,\r\n    \"duration\":55\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/exercise/",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"exercise",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "weight add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"dailyWeight\":15.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/weight",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"weight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "water intake",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"waterIntake\":15.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/water",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"water"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "yearly-weight-details",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"waterIntake\":15.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/yearly-weight-details?year=2024",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"yearly-weight-details"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "yearly-caloriesburned-details",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"waterIntake\":15.5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/yearly-caloriesburned-details?year=2024",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"yearly-caloriesburned-details"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "change-password",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"currentPassword\":\"Karan@1234\",\r\n    \"newPassword\":\"Karan@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/user/change-password",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"user",
+						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "otp/request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"email\":\"2810karanlathiya@gmail.com\",\r\n   \"eventType\":\"forgot_password\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/otp/request",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"otp",
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "otp/verify",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"email\":\"2810karanlathiya@gmail.com\",\r\n   \"eventType\":\"forgot_password\",\r\n   \"otp\":\"594660\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/otp/verify",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"otp",
+						"verify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set-new-password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "939741606530088961",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"email\":\"2810karanlathiya@gmail.com\",\r\n   \"eventType\":\"forgot_password\",\r\n   \"token\":\"fNYCKpQJ\",\r\n   \"newPassword\":\"Karan@1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://fitnesstracker-k5h0.onrender.com/set-new-password",
+					"protocol": "https",
+					"host": [
+						"fitnesstracker-k5h0",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"set-new-password"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

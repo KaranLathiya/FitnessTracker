@@ -94,6 +94,21 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 	return bodyData, err
 }
 
+// UserSignup example
+//
+// @tags User
+//	@Summary		Add a new user
+//	@Description	add new user details with Email, FullName, Password
+//	@ID				user-signup
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.UserSignup true "The input for add new user"
+//	@Success		200		{object}	models.UserID	
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/signup/ [post]
 func UserSignup(w http.ResponseWriter, r *http.Request) {
 	var userSignup models.UserSignup
 	var userID models.UserID
@@ -119,6 +134,22 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 	w.Write(userID_data)
 }
 
+// UserLogin example
+//
+// @tags User
+//	@Summary		login for a user
+//	@Description	login user with Email, Password
+//	@ID				user-login
+//	@Accept			json
+//	@Produce		json
+// @Param request body models.UserLogin true "The input for login for user"
+//	@Success		200		{object}	models.UserID	
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		401		{object}	models.Message	"Email id doesn't exist / Wrong password"
+//	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/login/ [post]
 func UserLogin(w http.ResponseWriter, r *http.Request) {
 	var userID models.UserID
 	var userLogin models.UserLogin

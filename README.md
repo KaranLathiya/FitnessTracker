@@ -65,6 +65,26 @@ To fetch profile details for user --GET
 
     http://localhost:8080/user/profile
 
+## For Change Password
+
+To change password for user  --POST
+
+    http://localhost:8080/user/change-password
+
+## For Forgot Password
+
+To get the otp in email for user  --POST
+
+    http://localhost:8080/otp/request
+
+To verify the otp for user  --POST
+
+    http://localhost:8080/otp/verify
+    
+To set the new password after otp verification for user  --POST
+
+    http://localhost:8080/set-new-password
+
 ## For Meal
 
 
@@ -111,7 +131,7 @@ To delete water details of user --DELETE
 
 To fetch monthly water details of user --GET
      
-    http://localhost:8080/user/alldetails
+    http://localhost:8080/user/alldetails?date=2024-02-06
 <!-- 
 ## For WaterIntake Monthly 
 
@@ -123,10 +143,10 @@ To fetch monthly water details of user --GET
 
 To fetch yearly Weight Details of user --GET
      
-    http://localhost:8080/user/yearly-weight-details
+    http://localhost:8080/user/yearly-weight-details?year=2024
 
 ## For  CaloriesBurned Details Yearly 
 
 To fetch yearly CaloriesBurned details of user --GET
      
-    http://localhost:8080/user/yearly-caloriesburned-details
+    http://localhost:8080/user/yearly-caloriesburned-details?year=2024

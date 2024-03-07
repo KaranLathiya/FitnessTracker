@@ -1,0 +1,952 @@
+definitions:
+  models.AllDetails:
+    properties:
+      exerciseDetails:
+        items:
+          $ref: '#/definitions/models.Exercise'
+        type: array
+      mealDetails:
+        items:
+          $ref: '#/definitions/models.Meal'
+        type: array
+      waterDetails:
+        items:
+          $ref: '#/definitions/models.Meal'
+        type: array
+      weightDetails:
+        items:
+          $ref: '#/definitions/models.Exercise'
+        type: array
+    type: object
+  models.Exercise:
+    properties:
+      caloriesBurned:
+        maximum: 20000
+        type: number
+      date:
+        type: string
+      duration:
+        maximum: 1440
+        type: integer
+      exerciseType:
+        enum:
+        - weight_lifting
+        - walking
+        - running
+        - gym
+        - yoga
+        type: string
+    required:
+    - caloriesBurned
+    - duration
+    - exerciseType
+    type: object
+  models.ExerciseType:
+    properties:
+      exerciseType:
+        enum:
+        - weight_lifting
+        - walking
+        - running
+        - gym
+        - yoga
+        type: string
+    required:
+    - exerciseType
+    type: object
+  models.Meal:
+    properties:
+      caloriesConsumed:
+        maximum: 20000
+        minimum: 0
+        type: number
+      date:
+        type: string
+      ingredients:
+        type: string
+      mealType:
+        enum:
+        - breakfast
+        - lunch
+        - snacks
+        - dinner
+        type: string
+    required:
+    - caloriesConsumed
+    - ingredients
+    - mealType
+    type: object
+  models.MealType:
+    properties:
+      mealType:
+        enum:
+        - breakfast
+        - lunch
+        - snacks
+        - dinner
+        type: string
+    required:
+    - mealType
+    type: object
+  models.Message:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    required:
+    - code
+    - message
+    type: object
+  models.UserID:
+    properties:
+      userId:
+        type: string
+    required:
+    - userId
+    type: object
+  models.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.UserSignup:
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - fullName
+    - password
+    type: object
+  models.Users:
+    properties:
+      age:
+        maximum: 130
+        type: integer
+      email:
+        type: string
+      fullName:
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      healthGoal:
+        enum:
+        - weight_loss
+        - weight_gain
+        - muscle_building
+        - maintain_body
+        type: string
+      height:
+        maximum: 300
+        minimum: 50
+        type: number
+      profilePhoto:
+        type: string
+      weight:
+        maximum: 700
+        minimum: 2
+        type: number
+    required:
+    - age
+    - email
+    - fullName
+    - gender
+    - healthGoal
+    - height
+    - weight
+    type: object
+  models.Water:
+    properties:
+      date:
+        type: string
+      waterIntake:
+        maximum: 20
+        type: number
+    required:
+    - waterIntake
+    type: object
+  models.Weight:
+    properties:
+      dailyWeight:
+        maximum: 700
+        minimum: 2
+        type: number
+      date:
+        type: string
+    required:
+    - dailyWeight
+    type: object
+  models.YearlyCaloriesBurned:
+    properties:
+      averageMonthlyCaloriesBurned:
+        type: number
+      month:
+        type: integer
+    required:
+    - averageMonthlyCaloriesBurned
+    - month
+    type: object
+  models.YearlyWeight:
+    properties:
+      averageMonthlyWeight:
+        type: number
+      month:
+        type: integer
+    required:
+    - averageMonthlyWeight
+    - month
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample Fitnessstracker server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fitnesstracker API
+  version: "1.0"
+paths:
+  /login/:
+    post:
+      consumes:
+      - application/json
+      description: login user with Email, Password
+      operationId: user-login
+      parameters:
+      - description: The input for login for user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserID'
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "401":
+          description: Email id doesn't exist / Wrong password
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: login for a user
+      tags:
+      - User
+  /signup/:
+    post:
+      consumes:
+      - application/json
+      description: add new user details with Email, FullName, Password
+      operationId: user-signup
+      parameters:
+      - description: The input for add new user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserSignup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserID'
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: Add a new user
+      tags:
+      - User
+  /user/alldetails:
+    get:
+      description: fetch all details by date
+      operationId: user-alldetails
+      parameters:
+      - description: date for which want to see details
+        example: '"2024-01-01"'
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AllDetails'
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: fetch all details
+      tags:
+      - User
+  /user/exercise/:
+    delete:
+      consumes:
+      - application/json
+      description: delete exercise details of today with ExerciseType
+      operationId: user-exercise-delete
+      parameters:
+      - description: The input for delete exercise
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ExerciseType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully deleted
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: delete exercise details of today
+      tags:
+      - Exercise
+    post:
+      consumes:
+      - application/json
+      description: add new exercise details with ExerciseType, Duration, CaloriesBurned,
+        Date(default)
+      operationId: user-exercise-add
+      parameters:
+      - description: The input for add exercise
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Exercise'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully added
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: Add a new exercise for today for today
+      tags:
+      - Exercise
+    put:
+      consumes:
+      - application/json
+      description: update exercise details like Duration, ExerciseType, CaloriesBurned
+      operationId: user-exercise-update
+      parameters:
+      - description: The input for update the exercise details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Exercise'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully updated
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: update exercise details of today
+      tags:
+      - Exercise
+  /user/meal/:
+    delete:
+      consumes:
+      - application/json
+      description: delete meal details of today with MealType
+      operationId: user-meal-delete
+      parameters:
+      - description: The input for delete meal
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.MealType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully deleted
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: delete meal details of today
+      tags:
+      - Meal
+    post:
+      consumes:
+      - application/json
+      description: add new meal details with MealType, Ingredients, CaloriesConsumed,
+        Date(default)
+      operationId: user-meal-add
+      parameters:
+      - description: The input for add meal
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Meal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully added
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: Add a new meal details for today
+      tags:
+      - Meal
+    put:
+      consumes:
+      - application/json
+      description: update meal details like Ingredients, MealType, CaloriesConsumed
+      operationId: user-meal-update
+      parameters:
+      - description: The input for update the meal details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Meal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully updated
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: update meal details of today
+      tags:
+      - Meal
+  /user/profile/:
+    put:
+      consumes:
+      - application/json
+      description: update user profile details like Email, FullName, Age, Gender,
+        Height, Weight, HealthGoal, ProfilePhoto
+      operationId: user-profile-update
+      parameters:
+      - description: The input for update the user profile details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Users'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully updated
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: update user profile details
+      tags:
+      - UserProfile
+  /user/water/:
+    delete:
+      consumes:
+      - application/json
+      description: delete water details of today
+      operationId: user-water-delete
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully deleted
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: delete water details of today
+      tags:
+      - Water
+    post:
+      consumes:
+      - application/json
+      description: add water details with in WaterIntake(in litre), Date(default)
+      operationId: user-water-add
+      parameters:
+      - description: The input for add daily water
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Water'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully added
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: Add water consumption for today
+      tags:
+      - Water
+    put:
+      consumes:
+      - application/json
+      description: update daily water details
+      operationId: user-water-update
+      parameters:
+      - description: The input for update the water details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Water'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully updated
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: update water details of today
+      tags:
+      - Water
+  /user/weight/:
+    delete:
+      consumes:
+      - application/json
+      description: delete weight details of today
+      operationId: user-weight-delete
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully deleted
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: delete weight details of today
+      tags:
+      - Weight
+    post:
+      consumes:
+      - application/json
+      description: add weight details with in DailyWeight(in kg), Date(default)
+      operationId: user-weight-add
+      parameters:
+      - description: The input for add weight
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Weight'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully added
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: Add weight for today
+      tags:
+      - Weight
+    put:
+      consumes:
+      - application/json
+      description: update daily weight details
+      operationId: user-weight
+      parameters:
+      - description: The input for update the weight details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Weight'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details Successfully updated
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "409":
+          description: This record contains duplicated data that conflicts with what
+            is already in the database
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: update weight details of today
+      tags:
+      - Weight
+  /user/yearly-caloriesburned-details:
+    get:
+      description: fetch monthly average of calories burned by date
+      operationId: user-yearlycaloriesburneddetails
+      parameters:
+      - description: year for which want to see details
+        example: '"2024"'
+        in: query
+        name: year
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.YearlyCaloriesBurned'
+            type: array
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: fetch monthly average of calories burned
+      tags:
+      - User
+  /user/yearly-weight-details:
+    get:
+      description: fetch monthly average of weight by date
+      operationId: user-yearlyweightdetails
+      parameters:
+      - description: year for which want to see details
+        example: '"2024"'
+        in: query
+        name: year
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.YearlyWeight'
+            type: array
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: fetch monthly average of weight
+      tags:
+      - User
+securityDefinitions:
+  UserIDAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

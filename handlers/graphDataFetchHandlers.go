@@ -9,6 +9,23 @@ import (
 	"strconv"
 )
 
+// FetchYearlyWeightDetails example
+//
+// @tags User
+// @Security UserIDAuth
+//
+//	@Summary		fetch monthly average of weight 
+//	@Description	fetch monthly average of weight by date
+//	@ID				user-yearlyweightdetails
+//	@Produce		json
+//
+// @Param   year     query     string     true  "year for which want to see details"     example("2024")
+//
+//	@Success		200		{object}	[]models.YearlyWeight
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/yearly-weight-details [get]
 func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	var yearlyWeight []models.YearlyWeight
@@ -57,6 +74,23 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 	w.Write(yearlyWeightDeatils)
 }
 
+// FetchYearlyCaloriesBurnedDetails example
+//
+// @tags User
+// @Security UserIDAuth
+//
+//	@Summary		fetch monthly average of calories burned
+//	@Description	fetch monthly average of calories burned by date
+//	@ID				user-yearlycaloriesburneddetails
+//	@Produce		json
+//
+// @Param   year     query     string     true  "year for which want to see details"     example("2024")
+//
+//	@Success		200		{object}	[]models.YearlyCaloriesBurned
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/yearly-caloriesburned-details [get]
 func FetchYearlyCaloriesBurnedDetails(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	var yearlyCaloriesBurned []models.YearlyCaloriesBurned

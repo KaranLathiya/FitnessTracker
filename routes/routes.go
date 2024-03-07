@@ -23,15 +23,14 @@ import (
 // 			return
 // 		}
 
-// 		// Call the original handler
-// 		handler(w, r)
-// 	}
-// }
-
+//			// Call the original handler
+//			handler(w, r)
+//		}
+//	}
+//
 func NewRouter() *chi.Mux {
 	r := chi.NewRouter()
 	r.Route("/", func(r chi.Router) {
-
 		r.Use(handlers.HandleCORS)
 		r.Post("/signup", handlers.UserSignup)
 		r.Post("/login", handlers.UserLogin)

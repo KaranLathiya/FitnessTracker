@@ -31,6 +31,20 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	w.Write(user_data)
 }
 
+// FetchAllDetails example
+//
+// @tags User
+// @Security UserIDAuth
+//	@Summary		fetch all details 
+//	@Description	fetch all details by date 
+//	@ID				user-alldetails
+//	@Produce		json
+// @Param   date     query     string     true  "date for which want to see details"     example("2024-01-01")
+//	@Success		200		{object}	models.AllDetails	
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/alldetails [get]
 func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 	allDetailsMap := make(map[string]interface{})
 	date := r.FormValue("date")
@@ -64,6 +78,12 @@ func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 	allDetailsMap["weightDetails"] = weight
 	allDetailsMap["exerciseDetails"] = exercise
 	allDetailsMap["mealDetails"] = meal
+	// var allDetails models.AllDetails
+	// allDetails.ExerciseDetails = exercise
+	// allDetails.MealDetails = meal
+	// allDetails.WeightDetails = weight
+	// allDetails.WaterDetails = water
+	// _, _ = json.MarshalIndent(allDetails, "", "  ")
 	allDetails, _ := json.Marshal(allDetailsMap)
 	w.Write(allDetails)
 }
