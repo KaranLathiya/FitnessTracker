@@ -37,19 +37,6 @@ definitions:
     - duration
     - exerciseType
     type: object
-  models.ExerciseType:
-    properties:
-      exerciseType:
-        enum:
-        - weight_lifting
-        - walking
-        - running
-        - gym
-        - yoga
-        type: string
-    required:
-    - exerciseType
-    type: object
   models.ForgotPasswordInput:
     properties:
       email:
@@ -88,18 +75,6 @@ definitions:
     required:
     - caloriesConsumed
     - ingredients
-    - mealType
-    type: object
-  models.MealType:
-    properties:
-      mealType:
-        enum:
-        - breakfast
-        - lunch
-        - snacks
-        - dinner
-        type: string
-    required:
     - mealType
     type: object
   models.Message:
@@ -266,7 +241,7 @@ definitions:
     - averageMonthlyWeight
     - month
     type: object
-host: localhost:8080
+host: fitnesstracker-k5h0.onrender.com
 info:
   contact:
     email: support@swagger.io
@@ -560,19 +535,19 @@ paths:
       summary: fetch all details
       tags:
       - UserDetails
-  /user/exercise/:
+  /user/exercise:
     delete:
       consumes:
       - application/json
       description: delete exercise details of today with ExerciseType
       operationId: user-exercise-delete
       parameters:
-      - description: The input for delete exercise
-        in: body
-        name: request
+      - description: exercisetype for which want to delete details
+        example: '"weight_lifting"'
+        in: query
+        name: exercisetype
         required: true
-        schema:
-          $ref: '#/definitions/models.ExerciseType'
+        type: string
       produces:
       - application/json
       responses:
@@ -602,6 +577,7 @@ paths:
       summary: delete exercise details of today
       tags:
       - Exercise
+  /user/exercise/:
     post:
       consumes:
       - application/json
@@ -685,19 +661,19 @@ paths:
       summary: update exercise details of today
       tags:
       - Exercise
-  /user/meal/:
+  /user/meal:
     delete:
       consumes:
       - application/json
       description: delete meal details of today with MealType
       operationId: user-meal-delete
       parameters:
-      - description: The input for delete meal
-        in: body
-        name: request
+      - description: mealtype for which want to delete details
+        example: '"breakfast"'
+        in: query
+        name: mealtype
         required: true
-        schema:
-          $ref: '#/definitions/models.MealType'
+        type: string
       produces:
       - application/json
       responses:
@@ -727,6 +703,7 @@ paths:
       summary: delete meal details of today
       tags:
       - Meal
+  /user/meal/:
     post:
       consumes:
       - application/json
@@ -882,7 +859,7 @@ paths:
       summary: update user profile details
       tags:
       - UserProfile
-  /user/water/:
+  /user/water:
     delete:
       consumes:
       - application/json
@@ -917,6 +894,7 @@ paths:
       summary: delete water details of today
       tags:
       - Water
+  /user/water/:
     post:
       consumes:
       - application/json
@@ -999,7 +977,7 @@ paths:
       summary: update water details of today
       tags:
       - Water
-  /user/weight/:
+  /user/weight:
     delete:
       consumes:
       - application/json
@@ -1034,6 +1012,7 @@ paths:
       summary: delete weight details of today
       tags:
       - Weight
+  /user/weight/:
     post:
       consumes:
       - application/json
@@ -1190,9 +1169,26 @@ paths:
       summary: fetch monthly average of weight
       tags:
       - UserDetails
+schemes:
+- https
 securityDefinitions:
   UserIDAuth:
     in: header
     name: Authorization
     type: apiKey
 swagger: "2.0"
+tags:
+- description: User signup, login, password change
+  name: User
+- description: User details fetch
+  name: UserDetails
+- description: User Meal details
+  name: Meal
+- description: User Exercise details
+  name: Exercise
+- description: User Water details
+  name: Water
+- description: User Weight details
+  name: Weight
+- description: UserProfile details
+  name: UserProfile

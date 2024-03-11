@@ -26,7 +26,23 @@ import (
 
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
-//	@host		localhost:8080
+//	@host		fitnesstracker-k5h0.onrender.com
+// @tag.name User
+// @tag.description User signup, login, password change
+// @tag.name UserDetails
+// @tag.description User details fetch
+// @tag.name Meal
+// @tag.description User Meal details 
+// @tag.name Exercise
+// @tag.description User Exercise details
+// @tag.name Water
+// @tag.description User Water details
+// @tag.name Weight
+// @tag.description User Weight details
+// @tag.name UserProfile
+// @tag.description UserProfile details
+
+// @schemes https
 
 // @securitydefinitions.apikey UserIDAuth
 // @in header

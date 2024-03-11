@@ -443,6 +443,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/exercise": {
+            "delete": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "description": "delete exercise details of today with ExerciseType",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exercise"
+                ],
+                "summary": "delete exercise details of today",
+                "operationId": "user-exercise-delete",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "\"weight_lifting\"",
+                        "description": "exercisetype for which want to delete details",
+                        "name": "exercisetype",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User details Successfully deleted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "409": {
+                        "description": "This record contains duplicated data that conflicts with what is already in the database",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/user/exercise/": {
             "put": {
                 "security": [
@@ -567,14 +630,16 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/user/meal": {
             "delete": {
                 "security": [
                     {
                         "UserIDAuth": []
                     }
                 ],
-                "description": "delete exercise details of today with ExerciseType",
+                "description": "delete meal details of today with MealType",
                 "consumes": [
                     "application/json"
                 ],
@@ -582,19 +647,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Exercise"
+                    "Meal"
                 ],
-                "summary": "delete exercise details of today",
-                "operationId": "user-exercise-delete",
+                "summary": "delete meal details of today",
+                "operationId": "user-meal-delete",
                 "parameters": [
                     {
-                        "description": "The input for delete exercise",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ExerciseType"
-                        }
+                        "type": "string",
+                        "example": "\"breakfast\"",
+                        "description": "mealtype for which want to delete details",
+                        "name": "mealtype",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -755,68 +819,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "UserIDAuth": []
-                    }
-                ],
-                "description": "delete meal details of today with MealType",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Meal"
-                ],
-                "summary": "delete meal details of today",
-                "operationId": "user-meal-delete",
-                "parameters": [
-                    {
-                        "description": "The input for delete meal",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.MealType"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User details Successfully deleted",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    },
-                    "409": {
-                        "description": "This record contains duplicated data that conflicts with what is already in the database",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    },
-                    "498": {
-                        "description": "Invalid token",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    }
-                }
             }
         },
         "/user/profile": {
@@ -896,6 +898,59 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "User details Successfully updated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "409": {
+                        "description": "This record contains duplicated data that conflicts with what is already in the database",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/water": {
+            "delete": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "description": "delete water details of today",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Water"
+                ],
+                "summary": "delete water details of today",
+                "operationId": "user-water-delete",
+                "responses": {
+                    "200": {
+                        "description": "User details Successfully deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -1051,14 +1106,16 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/user/weight": {
             "delete": {
                 "security": [
                     {
                         "UserIDAuth": []
                     }
                 ],
-                "description": "delete water details of today",
+                "description": "delete weight details of today",
                 "consumes": [
                     "application/json"
                 ],
@@ -1066,10 +1123,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Water"
+                    "Weight"
                 ],
-                "summary": "delete water details of today",
-                "operationId": "user-water-delete",
+                "summary": "delete weight details of today",
+                "operationId": "user-weight-delete",
                 "responses": {
                     "200": {
                         "description": "User details Successfully deleted",
@@ -1199,57 +1256,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "User details Successfully added",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    },
-                    "409": {
-                        "description": "This record contains duplicated data that conflicts with what is already in the database",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    },
-                    "498": {
-                        "description": "Invalid token",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Message"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "UserIDAuth": []
-                    }
-                ],
-                "description": "delete weight details of today",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Weight"
-                ],
-                "summary": "delete weight details of today",
-                "operationId": "user-weight-delete",
-                "responses": {
-                    "200": {
-                        "description": "User details Successfully deleted",
                         "schema": {
                             "type": "string"
                         }
@@ -1451,24 +1457,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ExerciseType": {
-            "type": "object",
-            "required": [
-                "exerciseType"
-            ],
-            "properties": {
-                "exerciseType": {
-                    "type": "string",
-                    "enum": [
-                        "weight_lifting",
-                        "walking",
-                        "running",
-                        "gym",
-                        "yoga"
-                    ]
-                }
-            }
-        },
         "models.ForgotPasswordInput": {
             "type": "object",
             "required": [
@@ -1514,23 +1502,6 @@ const docTemplate = `{
                 "ingredients": {
                     "type": "string"
                 },
-                "mealType": {
-                    "type": "string",
-                    "enum": [
-                        "breakfast",
-                        "lunch",
-                        "snacks",
-                        "dinner"
-                    ]
-                }
-            }
-        },
-        "models.MealType": {
-            "type": "object",
-            "required": [
-                "mealType"
-            ],
-            "properties": {
                 "mealType": {
                     "type": "string",
                     "enum": [
@@ -1787,15 +1758,45 @@ const docTemplate = `{
             "name": "Authorization",
             "in": "header"
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "User signup, login, password change",
+            "name": "User"
+        },
+        {
+            "description": "User details fetch",
+            "name": "UserDetails"
+        },
+        {
+            "description": "User Meal details",
+            "name": "Meal"
+        },
+        {
+            "description": "User Exercise details",
+            "name": "Exercise"
+        },
+        {
+            "description": "User Water details",
+            "name": "Water"
+        },
+        {
+            "description": "User Weight details",
+            "name": "Weight"
+        },
+        {
+            "description": "UserProfile details",
+            "name": "UserProfile"
+        }
+    ]
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "fitnesstracker-k5h0.onrender.com",
 	BasePath:         "",
-	Schemes:          []string{},
+	Schemes:          []string{"https"},
 	Title:            "Fitnesstracker API",
 	Description:      "This is a sample Fitnessstracker server.",
 	InfoInstanceName: "swagger",
