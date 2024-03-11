@@ -11,12 +11,12 @@ import (
 
 // FetchYearlyWeightDetails example
 //
-// @tags User
+// @tags UserDetails
 // @Security UserIDAuth
 //
 //	@Summary		fetch monthly average of weight 
 //	@Description	fetch monthly average of weight by date
-//	@ID				user-yearlyweightdetails
+//	@ID				user-yearlyweight-fetch
 //	@Produce		json
 //
 // @Param   year     query     string     true  "year for which want to see details"     example("2024")
@@ -76,12 +76,12 @@ func FetchYearlyWeightDetails(w http.ResponseWriter, r *http.Request) {
 
 // FetchYearlyCaloriesBurnedDetails example
 //
-// @tags User
+// @tags UserDetails
 // @Security UserIDAuth
 //
 //	@Summary		fetch monthly average of calories burned
 //	@Description	fetch monthly average of calories burned by date
-//	@ID				user-yearlycaloriesburneddetails
+//	@ID				user-yearlycaloriesburned-fetch
 //	@Produce		json
 //
 // @Param   year     query     string     true  "year for which want to see details"     example("2024")

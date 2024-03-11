@@ -12,7 +12,7 @@ import (
 //
 // @tags Exercise
 // @Security UserIDAuth
-//	@Summary		Add a new exercise for today for today
+//	@Summary		Add a new exercise for today
 //	@Description	add new exercise details with ExerciseType, Duration, CaloriesBurned, Date(default)
 //	@ID				user-exercise-add
 //	@Accept			json

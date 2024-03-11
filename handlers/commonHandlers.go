@@ -108,7 +108,7 @@ func dataReadFromBody(r *http.Request, bodyData interface{}) (interface{}, error
 //	@Failure		400		{object}	models.Message	"Invalid data"
 //	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
 //	@Failure		500		{object}	models.Message	"Internal server error"
-//	@Router			/signup/ [post]
+//	@Router			/signup [post]
 func UserSignup(w http.ResponseWriter, r *http.Request) {
 	var userSignup models.UserSignup
 	var userID models.UserID
@@ -149,7 +149,7 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 //	@Failure		401		{object}	models.Message	"Email id doesn't exist / Wrong password"
 //	@Failure		409		{object}	models.Message	"This record contains duplicated data that conflicts with what is already in the database"
 //	@Failure		500		{object}	models.Message	"Internal server error"
-//	@Router			/login/ [post]
+//	@Router			/login [post]
 func UserLogin(w http.ResponseWriter, r *http.Request) {
 	var userID models.UserID
 	var userLogin models.UserLogin
@@ -179,6 +179,21 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	w.Write(userID_data)
 }
 
+// OTPRequest example
+//
+// @tags User
+//	@Summary		otp for forgot user password
+//	@Description	send otp in registered email for set new user password in case of forgot password with Email, EventType
+//	@ID				user-otprequest
+//	@Accept			json
+// @Param request body models.RequestOTP true "The input for otp for forgot password"
+//	@Produce		json
+//	@Success		200				string		"OTP sent to email Successfully"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		401		{object}	models.Message	"Email id doesn't exist""
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/otp/request [post]
 func OTPRequest(w http.ResponseWriter, r *http.Request) {
 	var requestOTP models.RequestOTP
 	db := dal.GetDB()
@@ -219,6 +234,21 @@ func OTPRequest(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(200, "OTP sent to email Successfully", w)
 }
 
+// VerifyOTP example
+//
+// @tags User
+//	@Summary		verify otp for forgot user password
+//	@Description	otp verification for otp sent in registered email for set new user password in case of forgot password with Email, EventType, OTP
+//	@ID				user-verifyotp
+//	@Accept			json
+// @Param request body models.VerifyOTP true "The input for verify otp for forgot password"
+//	@Produce		json
+//	@Success		200		{object}	models.Token	
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		410		{object}	models.Message	"OTP Expired"
+//	@Failure		401		{object}	models.Message	"Invalid OTP""
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/otp/verify [post]
 func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 	var verifyOTP models.VerifyOTP
 	db := dal.GetDB()
@@ -264,28 +294,43 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(401, "Invalid OTP", w)
 }
 
-func SetNewPassword(w http.ResponseWriter, r *http.Request) {
-	var setNewPaswordInput models.SetNewPaswordInput
+// ForgotPassword example
+//
+// @tags User
+//	@Summary		set new password for user in case of forgot password
+//	@Description	after otp verification set new password with Email, EventType, Token, NewePassword
+//	@ID				user-forgotpassword
+//	@Accept			json
+// @Param request body models.ForgotPasswordInput true "The input for set new password"
+//	@Produce		json
+//	@Success		200				string		"Password successfully changed"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data "
+//	@Failure		401		{object}	models.Message	"Invalid email or eventType or token"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/forget-password [post]
+func ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var forgotPaswordInput models.ForgotPasswordInput
 	db := dal.GetDB()
-	_, err = dataReadFromBody(r, &setNewPaswordInput)
+	_, err = dataReadFromBody(r, &forgotPaswordInput)
 	if err != nil {
 		response.MessageShow(400, err.Error(), w)
 		return
 	}
 	var hashedToken string
-	errIfNoRows := db.QueryRow("SELECT token FROM public.token_details WHERE email=$1 AND event_type=$2", setNewPaswordInput.Email, setNewPaswordInput.EventType).Scan(&hashedToken)
+	errIfNoRows := db.QueryRow("SELECT token FROM public.token_details WHERE email=$1 AND event_type=$2", forgotPaswordInput.Email, forgotPaswordInput.EventType).Scan(&hashedToken)
 	if errIfNoRows != nil {
 		if errIfNoRows.Error() == "sql: no rows in result set" {
-			response.MessageShow(400, "Invalid email or eventType or token", w)
+			response.MessageShow(401, "Invalid email or eventType or token", w)
 			return
 		}
 		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(errIfNoRows)
 		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(hashedToken), []byte(setNewPaswordInput.Token))
+	err = bcrypt.CompareHashAndPassword([]byte(hashedToken), []byte(forgotPaswordInput.Token))
 	if err == nil {
-		bytes, _ := bcrypt.GenerateFromPassword([]byte(setNewPaswordInput.NewPassword), 14)
+		bytes, _ := bcrypt.GenerateFromPassword([]byte(forgotPaswordInput.NewPassword), 14)
 		hashedNewPassword := string(bytes)
 		tx, err := db.Begin()
 		if err != nil {
@@ -294,13 +339,13 @@ func SetNewPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer tx.Rollback()
-		_, err = tx.Exec("UPDATE public.user_details SET password=$1 WHERE email=$2;", hashedNewPassword, setNewPaswordInput.Email)
+		_, err = tx.Exec("UPDATE public.user_details SET password=$1 WHERE email=$2;", hashedNewPassword, forgotPaswordInput.Email)
 		if err != nil {
 			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
 			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 			return
 		}
-		_, err = tx.Exec("DELETE FROM public.token_details WHERE email=$1 AND event_type=$2;", setNewPaswordInput.Email, setNewPaswordInput.EventType)
+		_, err = tx.Exec("DELETE FROM public.token_details WHERE email=$1 AND event_type=$2;", forgotPaswordInput.Email, forgotPaswordInput.EventType)
 		if err != nil {
 			databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
 			response.MessageShow(databaseErrorCode, databaseErrorMessage, w)

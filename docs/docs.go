@@ -24,7 +24,130 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login/": {
+        "/change-password": {
+            "post": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "description": "set new password with CurrentPassword, NewPassword",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "set new password for user",
+                "operationId": "user-password-update",
+                "parameters": [
+                    {
+                        "description": "The input for set new password",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateUserPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User password successfully updated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data / current password and new password can't be same",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Email id doesn't exist",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/forget-password": {
+            "post": {
+                "description": "after otp verification set new password with Email, EventType, Token, NewePassword",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "set new password for user in case of forgot password",
+                "operationId": "user-forgotpassword",
+                "parameters": [
+                    {
+                        "description": "The input for set new password",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ForgotPasswordInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password successfully changed",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data ",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid email or eventType or token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
             "post": {
                 "description": "login user with Email, Password",
                 "consumes": [
@@ -89,7 +212,125 @@ const docTemplate = `{
                 }
             }
         },
-        "/signup/": {
+        "/otp/request": {
+            "post": {
+                "description": "send otp in registered email for set new user password in case of forgot password with Email, EventType",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "otp for forgot user password",
+                "operationId": "user-otprequest",
+                "parameters": [
+                    {
+                        "description": "The input for otp for forgot password",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestOTP"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OTP sent to email Successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Email id doesn't exist",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/otp/verify": {
+            "post": {
+                "description": "otp verification for otp sent in registered email for set new user password in case of forgot password with Email, EventType, OTP",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "verify otp for forgot user password",
+                "operationId": "user-verifyotp",
+                "parameters": [
+                    {
+                        "description": "The input for verify otp for forgot password",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VerifyOTP"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Token"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid OTP",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "410": {
+                        "description": "OTP Expired",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/signup": {
             "post": {
                 "description": "add new user details with Email, FullName, Password",
                 "consumes": [
@@ -160,10 +401,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "UserDetails"
                 ],
                 "summary": "fetch all details",
-                "operationId": "user-alldetails",
+                "operationId": "user-alldetails-fetch",
                 "parameters": [
                     {
                         "type": "string",
@@ -281,7 +522,7 @@ const docTemplate = `{
                 "tags": [
                     "Exercise"
                 ],
-                "summary": "Add a new exercise for today for today",
+                "summary": "Add a new exercise for today",
                 "operationId": "user-exercise-add",
                 "parameters": [
                     {
@@ -578,6 +819,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/profile": {
+            "get": {
+                "security": [
+                    {
+                        "UserIDAuth": []
+                    }
+                ],
+                "description": "fetch user profile with Email, FullName, Age, Gender, Height, Weight, HealthGoal, ProfilePhoto",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserDetails"
+                ],
+                "summary": "fetch user profile details",
+                "operationId": "user-profiledetails",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.AllDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "498": {
+                        "description": "Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    }
+                }
+            }
+        },
         "/user/profile/": {
             "put": {
                 "security": [
@@ -837,7 +1122,7 @@ const docTemplate = `{
                     "Weight"
                 ],
                 "summary": "update weight details of today",
-                "operationId": "user-weight",
+                "operationId": "user-weight-update",
                 "parameters": [
                     {
                         "description": "The input for update the weight details",
@@ -1008,10 +1293,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "UserDetails"
                 ],
                 "summary": "fetch monthly average of calories burned",
-                "operationId": "user-yearlycaloriesburneddetails",
+                "operationId": "user-yearlycaloriesburned-fetch",
                 "parameters": [
                     {
                         "type": "string",
@@ -1065,10 +1350,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "UserDetails"
                 ],
                 "summary": "fetch monthly average of weight",
-                "operationId": "user-yearlyweightdetails",
+                "operationId": "user-yearlyweight-fetch",
                 "parameters": [
                     {
                         "type": "string",
@@ -1128,16 +1413,10 @@ const docTemplate = `{
                     }
                 },
                 "waterDetails": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Meal"
-                    }
+                    "$ref": "#/definitions/models.Water"
                 },
                 "weightDetails": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Exercise"
-                    }
+                    "$ref": "#/definitions/models.Weight"
                 }
             }
         },
@@ -1187,6 +1466,32 @@ const docTemplate = `{
                         "gym",
                         "yoga"
                     ]
+                }
+            }
+        },
+        "models.ForgotPasswordInput": {
+            "type": "object",
+            "required": [
+                "email",
+                "eventType",
+                "newPassword",
+                "token"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "eventType": {
+                    "type": "string",
+                    "enum": [
+                        "forgot_password"
+                    ]
+                },
+                "newPassword": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         },
@@ -1248,6 +1553,50 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RequestOTP": {
+            "type": "object",
+            "required": [
+                "email",
+                "eventType"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "eventType": {
+                    "type": "string",
+                    "enum": [
+                        "forgot_password"
+                    ]
+                }
+            }
+        },
+        "models.Token": {
+            "type": "object",
+            "required": [
+                "token"
+            ],
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateUserPassword": {
+            "type": "object",
+            "required": [
+                "currentPassword",
+                "newPassword"
+            ],
+            "properties": {
+                "currentPassword": {
+                    "type": "string"
+                },
+                "newPassword": {
                     "type": "string"
                 }
             }
@@ -1348,6 +1697,25 @@ const docTemplate = `{
                     "type": "number",
                     "maximum": 700,
                     "minimum": 2
+                }
+            }
+        },
+        "models.VerifyOTP": {
+            "type": "object",
+            "required": [
+                "email",
+                "eventType",
+                "otp"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "eventType": {
+                    "type": "string"
+                },
+                "otp": {
+                    "type": "string"
                 }
             }
         },

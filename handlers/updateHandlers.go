@@ -127,7 +127,7 @@ func UpdateExerciseDetails(w http.ResponseWriter, r *http.Request) {
 // @Security UserIDAuth
 //	@Summary		update weight details of today
 //	@Description	update daily weight details 
-//	@ID				user-weight
+//	@ID				user-weight-update
 //	@Accept			json
 //	@Produce		json
 // @Param request body models.Weight true "The input for update the weight details"
@@ -195,16 +195,32 @@ func UpdateWaterDetails(w http.ResponseWriter, r *http.Request) {
 	response.MessageShow(200, "User details Successfully updated", w)
 }
 
+// UpdateUserPassword example
+//
+// @tags User
+// @Security UserIDAuth
+//	@Summary		set new password for user 
+//	@Description	set new password with CurrentPassword, NewPassword 
+//	@ID				user-password-update
+//	@Accept			json
+// @Param request body models.UpdateUserPassword true "The input for set new password"
+//	@Produce		json
+//	@Success		200				string		"User password successfully updated"
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data / current password and new password can't be same"
+//	@Failure		401		{object}	models.Message	"Email id doesn't exist"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/change-password [post]
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
-	var password models.ChangePassword
+	var updateUserPassword models.UpdateUserPassword
 	var RowsAffected int64
 	db := dal.GetDB()
-	_, err = dataReadFromBody(r, &password)
+	_, err = dataReadFromBody(r, &updateUserPassword)
 	if err != nil {
 		response.MessageShow(400, err.Error(), w)
 		return
 	}
-	if password.CurrentPassword == password.NewPassword {
+	if updateUserPassword.CurrentPassword == updateUserPassword.NewPassword {
 		response.MessageShow(400, "current password and new password can't be same", w)
 		return
 	}
@@ -219,14 +235,14 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(currentHashedpassword), []byte(password.CurrentPassword))
+	err := bcrypt.CompareHashAndPassword([]byte(currentHashedpassword), []byte(updateUserPassword.CurrentPassword))
 	if err != nil {
 		response.MessageShow(401, "Wrong password", w)
 		return
 	}
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(password.NewPassword), 14)
-	password.NewPassword = string(bytes)
-	RowsAffected, err = dal.MustExec("UPDATE public.user_details SET password=$1 WHERE user_id=$2;", password.NewPassword, UserID.UserID)
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(updateUserPassword.NewPassword), 14)
+	updateUserPassword.NewPassword = string(bytes)
+	RowsAffected, err = dal.MustExec("UPDATE public.user_details SET password=$1 WHERE user_id=$2;", updateUserPassword.NewPassword, UserID.UserID)
 	if err != nil {
 		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
 		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)

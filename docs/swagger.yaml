@@ -10,13 +10,9 @@ definitions:
           $ref: '#/definitions/models.Meal'
         type: array
       waterDetails:
-        items:
-          $ref: '#/definitions/models.Meal'
-        type: array
+        $ref: '#/definitions/models.Water'
       weightDetails:
-        items:
-          $ref: '#/definitions/models.Exercise'
-        type: array
+        $ref: '#/definitions/models.Weight'
     type: object
   models.Exercise:
     properties:
@@ -53,6 +49,24 @@ definitions:
         type: string
     required:
     - exerciseType
+    type: object
+  models.ForgotPasswordInput:
+    properties:
+      email:
+        type: string
+      eventType:
+        enum:
+        - forgot_password
+        type: string
+      newPassword:
+        type: string
+      token:
+        type: string
+    required:
+    - email
+    - eventType
+    - newPassword
+    - token
     type: object
   models.Meal:
     properties:
@@ -97,6 +111,35 @@ definitions:
     required:
     - code
     - message
+    type: object
+  models.RequestOTP:
+    properties:
+      email:
+        type: string
+      eventType:
+        enum:
+        - forgot_password
+        type: string
+    required:
+    - email
+    - eventType
+    type: object
+  models.Token:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  models.UpdateUserPassword:
+    properties:
+      currentPassword:
+        type: string
+      newPassword:
+        type: string
+    required:
+    - currentPassword
+    - newPassword
     type: object
   models.UserID:
     properties:
@@ -169,6 +212,19 @@ definitions:
     - height
     - weight
     type: object
+  models.VerifyOTP:
+    properties:
+      email:
+        type: string
+      eventType:
+        type: string
+      otp:
+        type: string
+    required:
+    - email
+    - eventType
+    - otp
+    type: object
   models.Water:
     properties:
       date:
@@ -224,7 +280,88 @@ info:
   title: Fitnesstracker API
   version: "1.0"
 paths:
-  /login/:
+  /change-password:
+    post:
+      consumes:
+      - application/json
+      description: set new password with CurrentPassword, NewPassword
+      operationId: user-password-update
+      parameters:
+      - description: The input for set new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User password successfully updated
+          schema:
+            type: string
+        "400":
+          description: Invalid data / current password and new password can't be same
+          schema:
+            $ref: '#/definitions/models.Message'
+        "401":
+          description: Email id doesn't exist
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: set new password for user
+      tags:
+      - User
+  /forget-password:
+    post:
+      consumes:
+      - application/json
+      description: after otp verification set new password with Email, EventType,
+        Token, NewePassword
+      operationId: user-forgotpassword
+      parameters:
+      - description: The input for set new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ForgotPasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password successfully changed
+          schema:
+            type: string
+        "400":
+          description: 'Invalid data '
+          schema:
+            $ref: '#/definitions/models.Message'
+        "401":
+          description: Invalid email or eventType or token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: set new password for user in case of forgot password
+      tags:
+      - User
+  /login:
     post:
       consumes:
       - application/json
@@ -268,7 +405,87 @@ paths:
       summary: login for a user
       tags:
       - User
-  /signup/:
+  /otp/request:
+    post:
+      consumes:
+      - application/json
+      description: send otp in registered email for set new user password in case
+        of forgot password with Email, EventType
+      operationId: user-otprequest
+      parameters:
+      - description: The input for otp for forgot password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestOTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OTP sent to email Successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "401":
+          description: Email id doesn't exist
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: otp for forgot user password
+      tags:
+      - User
+  /otp/verify:
+    post:
+      consumes:
+      - application/json
+      description: otp verification for otp sent in registered email for set new user
+        password in case of forgot password with Email, EventType, OTP
+      operationId: user-verifyotp
+      parameters:
+      - description: The input for verify otp for forgot password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.VerifyOTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Token'
+        "401":
+          description: Invalid OTP
+          schema:
+            $ref: '#/definitions/models.Message'
+        "410":
+          description: OTP Expired
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      summary: verify otp for forgot user password
+      tags:
+      - User
+  /signup:
     post:
       consumes:
       - application/json
@@ -311,7 +528,7 @@ paths:
   /user/alldetails:
     get:
       description: fetch all details by date
-      operationId: user-alldetails
+      operationId: user-alldetails-fetch
       parameters:
       - description: date for which want to see details
         example: '"2024-01-01"'
@@ -342,7 +559,7 @@ paths:
       - UserIDAuth: []
       summary: fetch all details
       tags:
-      - User
+      - UserDetails
   /user/exercise/:
     delete:
       consumes:
@@ -424,7 +641,7 @@ paths:
             $ref: '#/definitions/models.Message'
       security:
       - UserIDAuth: []
-      summary: Add a new exercise for today for today
+      summary: Add a new exercise for today
       tags:
       - Exercise
     put:
@@ -593,6 +810,35 @@ paths:
       summary: update meal details of today
       tags:
       - Meal
+  /user/profile:
+    get:
+      description: fetch user profile with Email, FullName, Age, Gender, Height, Weight,
+        HealthGoal, ProfilePhoto
+      operationId: user-profiledetails
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AllDetails'
+        "400":
+          description: Invalid data
+          schema:
+            $ref: '#/definitions/models.Message'
+        "498":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/models.Message'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Message'
+      security:
+      - UserIDAuth: []
+      summary: fetch user profile details
+      tags:
+      - UserDetails
   /user/profile/:
     put:
       consumes:
@@ -833,7 +1079,7 @@ paths:
       consumes:
       - application/json
       description: update daily weight details
-      operationId: user-weight
+      operationId: user-weight-update
       parameters:
       - description: The input for update the weight details
         in: body
@@ -873,7 +1119,7 @@ paths:
   /user/yearly-caloriesburned-details:
     get:
       description: fetch monthly average of calories burned by date
-      operationId: user-yearlycaloriesburneddetails
+      operationId: user-yearlycaloriesburned-fetch
       parameters:
       - description: year for which want to see details
         example: '"2024"'
@@ -906,11 +1152,11 @@ paths:
       - UserIDAuth: []
       summary: fetch monthly average of calories burned
       tags:
-      - User
+      - UserDetails
   /user/yearly-weight-details:
     get:
       description: fetch monthly average of weight by date
-      operationId: user-yearlyweightdetails
+      operationId: user-yearlyweight-fetch
       parameters:
       - description: year for which want to see details
         example: '"2024"'
@@ -943,7 +1189,7 @@ paths:
       - UserIDAuth: []
       summary: fetch monthly average of weight
       tags:
-      - User
+      - UserDetails
 securityDefinitions:
   UserIDAuth:
     in: header

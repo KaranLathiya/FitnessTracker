@@ -83,7 +83,7 @@ To verify the otp for user  --POST
     
 To set the new password after otp verification for user  --POST
 
-    http://localhost:8080/set-new-password
+    http://localhost:8080/forgot-password
 
 ## For Meal
 

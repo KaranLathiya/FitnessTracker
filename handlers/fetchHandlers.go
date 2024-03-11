@@ -9,6 +9,19 @@ import (
 	"time"
 )
 
+// FetchUserProfileDetails example
+//
+// @tags UserDetails
+// @Security UserIDAuth
+//	@Summary		fetch user profile details 
+//	@Description	fetch user profile with Email, FullName, Age, Gender, Height, Weight, HealthGoal, ProfilePhoto
+//	@ID				user-profiledetails
+//	@Produce		json
+//	@Success		200		{object}	models.AllDetails	
+//	@Failure		498		{object}	models.Message	"Invalid token"
+//	@Failure		400		{object}	models.Message	"Invalid data"
+//	@Failure		500		{object}	models.Message	"Internal server error"
+//	@Router			/user/profile [get]
 func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 	db := dal.GetDB()
 	var user models.Users
@@ -27,17 +40,17 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	defer rows.Close()
-	user_data, _ := json.MarshalIndent(user, "", "  ")
-	w.Write(user_data)
+	userProfileDetails, _ := json.MarshalIndent(user, "", "  ")
+	w.Write(userProfileDetails)
 }
 
 // FetchAllDetails example
 //
-// @tags User
+// @tags UserDetails
 // @Security UserIDAuth
 //	@Summary		fetch all details 
 //	@Description	fetch all details by date 
-//	@ID				user-alldetails
+//	@ID				user-alldetails-fetch
 //	@Produce		json
 // @Param   date     query     string     true  "date for which want to see details"     example("2024-01-01")
 //	@Success		200		{object}	models.AllDetails	
@@ -46,7 +59,7 @@ func FetchUserProfileDetails(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500		{object}	models.Message	"Internal server error"
 //	@Router			/user/alldetails [get]
 func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
-	allDetailsMap := make(map[string]interface{})
+	// allDetailsMap := make(map[string]interface{})
 	date := r.FormValue("date")
 	dateLayout := "2006-01-02"
 	_, err := time.Parse(dateLayout, date)
@@ -74,21 +87,28 @@ func FetchAllDetails(w http.ResponseWriter, r *http.Request) {
 		response.MessageShow(500, "Internal server error", w)
 		return
 	}
-	allDetailsMap["waterDetails"] = water
-	allDetailsMap["weightDetails"] = weight
-	allDetailsMap["exerciseDetails"] = exercise
-	allDetailsMap["mealDetails"] = meal
-	// var allDetails models.AllDetails
-	// allDetails.ExerciseDetails = exercise
-	// allDetails.MealDetails = meal
-	// allDetails.WeightDetails = weight
-	// allDetails.WaterDetails = water
-	// _, _ = json.MarshalIndent(allDetails, "", "  ")
-	allDetails, _ := json.Marshal(allDetailsMap)
-	w.Write(allDetails)
+	// allDetailsMap["waterDetails"] = water
+	// allDetailsMap["weightDetails"] = weight
+	// allDetailsMap["exerciseDetails"] = exercise
+	// allDetailsMap["mealDetails"] = meal
+	var allDetails models.AllDetails
+	allDetails.ExerciseDetails = exercise
+	allDetails.MealDetails = meal
+	if weight.DailyWeight == 0 {
+		allDetails.WeightDetails = nil
+	} else {
+	allDetails.WeightDetails = &weight
+	}
+	if weight.DailyWeight == 0 {
+		allDetails.WaterDetails =  nil
+	} else {
+	allDetails.WaterDetails = &water
+	}
+	userAlldetails, _ := json.MarshalIndent(allDetails, "", "  ")
+	w.Write(userAlldetails)
 }
 
-func fetchExerciseDetails(date string) (interface{}, error) {
+func fetchExerciseDetails(date string) ([]models.Exercise, error) {
 	db := dal.GetDB()
 	var exercise []models.Exercise
 	rows, err := db.Query("SELECT exercise_type, duration, calories_burned FROM public.exercise_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
@@ -110,7 +130,7 @@ func fetchExerciseDetails(date string) (interface{}, error) {
 	return exercise, err
 }
 
-func fetchMealDetails(date string) (interface{}, error) {
+func fetchMealDetails(date string) ([]models.Meal, error) {
 	db := dal.GetDB()
 	var meal []models.Meal
 	rows, err := db.Query("SELECT meal_type, ingredients, calories_consumed FROM public.meal_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
@@ -131,7 +151,8 @@ func fetchMealDetails(date string) (interface{}, error) {
 	_, _ = json.MarshalIndent(meal, "", "  ")
 	return meal, err
 }
-func fetchWeightDetails(date string) (interface{}, error) {
+
+func fetchWeightDetails(date string) (models.Weight, error) {
 	db := dal.GetDB()
 	var weight models.Weight
 	rows, err := db.Query("SELECT daily_weight FROM public.weight_details WHERE user_id=$1 AND date=$2 ", UserID.UserID, date)
@@ -147,14 +168,14 @@ func fetchWeightDetails(date string) (interface{}, error) {
 		i += 1
 	}
 	if i == 0 {
-		return nil, err
+		return weight, err
 	}
 	defer rows.Close()
 	_, _ = json.MarshalIndent(weight, "", "  ")
 	return weight, err
 }
 
-func fetchWaterDetails(date string) (interface{}, error) {
+func fetchWaterDetails(date string) (models.Water, error) {
 	db := dal.GetDB()
 	var water models.Water
 	rows, err := db.Query("SELECT water_intake FROM public.water_details WHERE user_id=$1 AND date=$2", UserID.UserID, date)
@@ -172,7 +193,7 @@ func fetchWaterDetails(date string) (interface{}, error) {
 	}
 	defer rows.Close()
 	if i == 0 {
-		return nil, err
+		return water, err
 	}
 	_, _ = json.MarshalIndent(water, "", "  ")
 	return water, err

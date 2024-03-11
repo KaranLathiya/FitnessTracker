@@ -74,8 +74,8 @@ type UserID struct {
 	UserID string `json:"userId"  validate:"required" `
 }
 
-// ChangePassword example
-type ChangePassword struct {
+// UpdateUserPassword example
+type UpdateUserPassword struct {
 	CurrentPassword string `json:"currentPassword"  validate:"required" `
 	NewPassword     string `json:"newPassword"  validate:"required" `
 }
@@ -115,17 +115,18 @@ type YearlyCaloriesBurned struct {
 	AverageMonthlyCaloriesBurned float32 `json:"averageMonthlyCaloriesBurned" validate:"required"`
 }
 
-// SetNewPaswordInput example
-type SetNewPaswordInput struct {
+// ForgotPaswordInput example
+type ForgotPasswordInput struct {
 	Email       string `json:"email" validate:"required,email" `
 	EventType   string `json:"eventType" validate:"required,oneof=forgot_password" `
 	Token       string `json:"token"  validate:"required"`
 	NewPassword string `json:"newPassword"  validate:"required"`
 }
 
+// AllDetails example
 type AllDetails struct{
 	MealDetails []Meal `json:"mealDetails" `
 	ExerciseDetails []Exercise `json:"exerciseDetails" `
-	WaterDetails []Meal `json:"waterDetails" `
-	WeightDetails []Exercise `json:"weightDetails" `
+	WaterDetails *Water `json:"waterDetails" `
+	WeightDetails *Weight `json:"weightDetails" `
 }

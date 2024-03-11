@@ -612,7 +612,7 @@
 			"response": []
 		},
 		{
-			"name": "set-new-password",
+			"name": "forgot-password",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -633,7 +633,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://fitnesstracker-k5h0.onrender.com/set-new-password",
+					"raw": "https://fitnesstracker-k5h0.onrender.com/forgot-password",
 					"protocol": "https",
 					"host": [
 						"fitnesstracker-k5h0",
@@ -641,7 +641,7 @@
 						"com"
 					],
 					"path": [
-						"set-new-password"
+						"forgot-password"
 					]
 				}
 			},
