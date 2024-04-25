@@ -43,6 +43,12 @@ Start the server
   go run server/server.go
 ```
 
+# API Documentation
+
+Swagger documentation for api 
+
+    http://localhost:8080/swagger/index.html
+
 # Routing
 
 ## For Signup 
