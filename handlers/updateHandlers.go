@@ -231,7 +231,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 			response.MessageShow(401, "Email id doesn't exist", w)
 			return
 		}
-		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(err)
+		databaseErrorMessage, databaseErrorCode := response.DatabaseErrorShow(errIfNoRows)
 		response.MessageShow(databaseErrorCode, databaseErrorMessage, w)
 		return
 	}
